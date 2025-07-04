@@ -28,9 +28,9 @@
     "baseUrl": ".",
     "paths": {
       "@dtax-bridge/shared": ["packages/shared/src/index.ts"],
-      "@dtax-bridge/tax-calculator": ["packages/tax-calculator/src/index.ts"],
-      "@dtax-bridge/logistics-api": ["packages/logistics-api/src/index.ts"],
-      "@dtax-bridge/compliance": ["packages/compliance/src/index.ts"]
+      "@dtax-bridge/tax-engine": ["packages/tax-engine/src/index.ts"],
+      "@dtax-bridge/logistics-engine": ["packages/logistics-engine/src/index.ts"],
+      "@dtax-bridge/compliance-engine": ["packages/compliance-engine/src/index.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
