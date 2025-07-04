@@ -1,18 +1,4 @@
-import React, { useState } from 'react'
-import { 
-  Page, 
-  Layout, 
-  Card, 
-  Text, 
-  Badge, 
-  Button,
-  ButtonGroup,
-  Divider,
-  Box,
-  Grid,
-  DataTable,
-  Link
-} from '@shopify/polaris'
+import React, { useState, useEffect } from 'react'
 import { 
   OrderIcon, 
   ProductIcon, 
@@ -26,248 +12,264 @@ import { formatCurrency, calculateGrowthRate } from '../utils'
 
 export function Dashboard() {
   const navigate = useNavigate()
+  const [animatedValues, setAnimatedValues] = useState({
+    orders: 0,
+    revenue: 0,
+    conversion: 0,
+    iossRate: 0,
+    deliveryRate: 0,
+    apiSuccess: 0
+  })
 
-  // 当前计划信息
-  const currentPlan = {
-    name: 'Standard Plan',
-    price: '$29.99',
-    period: '每30天',
-    status: 'Activated',
-    subscriptionId: 'DTX1234567890',
-    created: '创建时间：2024年1月15日',
-    activated: '激活时间：2024年1月15日'
+  // KPI数据 - 参考demo.html的指标
+  const kpiData = [
+    {
+      id: 'orders',
+      title: '总订单 (含税)',
+      value: 1820,
+      change: { value: 6.2, positive: true, period: 'vs 上月' },
+      icon: OrderIcon
+    },
+    {
+      id: 'revenue', 
+      title: '预估总税费 (USD)',
+      value: 21450,
+      prefix: '$',
+      change: { value: 5.8, positive: true, period: 'vs 上月' },
+      icon: ChartVerticalIcon
+    },
+    {
+      id: 'conversion',
+      title: '结账转化率提升',
+      value: 6.15,
+      suffix: '%',
+      prefix: '+',
+      change: { value: null, positive: true, period: '目标: ≥ 6%' },
+      icon: ProductIcon
+    },
+    {
+      id: 'iossRate',
+      title: 'IOSS 自动申报率',
+      value: 92.5,
+      suffix: '%',
+      change: { value: 12.5, positive: true, period: 'vs 上月' },
+      icon: DeliveryIcon
+    },
+    {
+      id: 'deliveryRate',
+      title: '物流时效达成率',
+      value: 98.1,
+      suffix: '%',
+      change: { value: 0.5, positive: true, period: 'vs 上月' },
+      icon: SettingsIcon
+    },
+    {
+      id: 'apiSuccess',
+      title: '计算API调用成功率',
+      value: 99.98,
+      suffix: '%',
+      change: { value: null, positive: true, period: 'SLA: ≥ 99.9%' },
+      icon: ExternalIcon
+    }
+  ]
+
+  // 动画效果
+  useEffect(() => {
+    const animateValue = (field: string, targetValue: number, duration: number = 500) => {
+      let startValue = 0
+      const startTime = Date.now()
+      
+      const animate = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const currentValue = startValue + (targetValue - startValue) * progress
+        
+        setAnimatedValues(prev => ({
+          ...prev,
+          [field]: currentValue
+        }))
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate)
+        }
+      }
+      
+      animate()
+    }
+
+    // 启动所有动画
+    kpiData.forEach((kpi, index) => {
+      setTimeout(() => {
+        animateValue(kpi.id, kpi.value, 800)
+      }, index * 100)
+    })
+  }, [])
+
+  // KPI卡片组件 - 使用全局样式
+  const KpiCard = ({ kpi }: { kpi: any }) => {
+    const IconComponent = kpi.icon
+    const animatedValue = animatedValues[kpi.id as keyof typeof animatedValues]
+    
+    const formatValue = (value: number) => {
+      if (kpi.id === 'revenue') {
+        return Math.floor(value).toLocaleString()
+      } else if (kpi.suffix === '%') {
+        return value.toFixed(kpi.id === 'conversion' ? 2 : 1)
+      }
+      return Math.floor(value).toLocaleString()
+    }
+
+    const getChangeColor = () => {
+      if (!kpi.change.value) return 'var(--info-blue)'
+      return kpi.change.positive ? '#10B981' : '#EF4444'
+    }
+
+    return (
+      <div className="kpi-card animate-countup">
+        <h3>{kpi.title}</h3>
+        <div className="value">
+          {kpi.prefix && kpi.prefix}
+          {formatValue(animatedValue)}
+          {kpi.suffix && kpi.suffix}
+        </div>
+        <div className="change">
+          <span 
+            className={kpi.change.value ? (kpi.change.positive ? 'positive' : 'negative') : 'neutral'}
+          >
+            {kpi.change.value && `▲ ${kpi.change.value}%`} {kpi.change.period}
+          </span>
+        </div>
+      </div>
+    )
   }
 
-  // 本月使用情况
-  const monthlyUsage = [
-    { type: '税费计算', used: 1248, limit: 5000, price: '$0.05/次' },
-    { type: '物流查询', used: 856, limit: 3000, price: '$0.03/次' },
-    { type: 'API调用', used: 2104, limit: 10000, price: '$0.01/次' }
-  ]
-
-  // 最近发票
-  const recentInvoices = [
-    { date: '2024年7月1日', amount: '$29.99', status: 'paid' },
-    { date: '2024年6月1日', amount: '$29.99', status: 'paid' },
-    { date: '2024年5月1日', amount: '$29.99', status: 'paid' }
-  ]
-
-  // 使用情况表格数据
-  const usageTableRows = monthlyUsage.map((usage) => [
-    usage.type,
-    `${usage.used.toLocaleString()} / ${usage.limit.toLocaleString()}`,
-    <div key={usage.type} style={{ width: '100px', backgroundColor: '#f0f0f0', borderRadius: '4px', height: '8px' }}>
-      <div 
-        style={{ 
-          width: `${(usage.used / usage.limit) * 100}%`, 
-          backgroundColor: usage.used / usage.limit > 0.8 ? '#ff6b6b' : '#4ecdc4',
-          borderRadius: '4px',
-          height: '100%'
-        }}
-      />
-    </div>,
-    usage.price
-  ])
-
-  // 发票表格数据
-  const invoiceTableRows = recentInvoices.map((invoice) => [
-    invoice.date,
-    invoice.amount,
-    <Badge key={invoice.date} status={invoice.status === 'paid' ? 'success' : 'warning'}>
-      {invoice.status === 'paid' ? '已支付' : '待支付'}
-    </Badge>
-  ])
-
   return (
-    <Page 
-      title="服务计划"
-      subtitle="查看使用费用"
-      secondaryActions={[
-        {
-          content: '查看待付款项',
-          onAction: () => navigate('/billing/pending')
-        },
-        {
-          content: '申请退款',
-          onAction: () => navigate('/billing/refund')
-        }
-      ]}
-    >
-      <Layout>
-        {/* 当前计划信息卡片 */}
-        <Layout.Section>
-          <Card>
-            <Box padding="600">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Text variant="headingLg" as="h2">
-                    {currentPlan.name}
-                  </Text>
-                  <Badge status="success">{currentPlan.status}</Badge>
-                </div>
-                <Button 
-                  icon={SettingsIcon}
-                  onClick={() => navigate('/settings/billing')}
-                >
-                  管理计划
-                </Button>
+    <div>
+      {/* KPI 指标网格 - 使用全局样式类 */}
+      <div className="kpi-grid">
+        {kpiData.map((kpi) => (
+          <KpiCard key={kpi.id} kpi={kpi} />
+        ))}
+      </div>
+
+      {/* 订单趋势图表 - 使用全局样式类 */}
+      <div className="chart-card">
+        <div className="kpi-card">
+          <div style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', margin: '0 0 8px 0' }}>
+              订单模式趋势 (近30天)
+            </h3>
+          </div>
+          
+          <div className="chart-placeholder">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '16px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                📈 订单趋势图表
               </div>
-              
-              <div style={{ marginBottom: '24px' }}>
-                <Text variant="bodySm" color="subdued">
-                  查看使用费用
-                </Text>
+              <div style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                DDP订单增长显著，DAP订单稳步下降
               </div>
+              <button 
+                style={{
+                  background: 'var(--brand-primary)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+                onClick={() => navigate('/reports/charts')}
+              >
+                查看详细图表
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              <div style={{ marginBottom: '24px' }}>
-                <Text variant="bodySm" color="subdued">应用订阅ID {currentPlan.subscriptionId}</Text>
-                <Text variant="headingXl" as="h3">{currentPlan.price} {currentPlan.period}</Text>
-                <Text variant="bodySm" color="subdued">{currentPlan.created}</Text>
-                <Text variant="bodySm" color="subdued">{currentPlan.activated}</Text>
-              </div>
-
-              <Divider />
-
-              <div style={{ marginTop: '24px', marginBottom: '16px' }}>
-                <Text variant="bodyMd" fontWeight="semibold">应用</Text>
-                <div style={{ marginTop: '8px' }}>
-                  <Link 
-                    url="#" 
-                    external
-                    onClick={() => window.open('https://apps.shopify.com/dtax-bridge', '_blank')}
-                  >
-                    DTax-Bridge 跨境税费&物流一体化
-                  </Link>
-                </div>
-              </div>
-
-              <div>
-                <Text variant="bodyMd" fontWeight="semibold">商店</Text>
-                <div style={{ marginTop: '8px' }}>
-                  <Link 
-                    url="#" 
-                    external
-                    onClick={() => window.open('https://your-store.myshopify.com', '_blank')}
-                  >
-                    您的跨境商店
-                  </Link>
-                </div>
-              </div>
-            </Box>
-          </Card>
-        </Layout.Section>
-
-        {/* 使用情况和账单信息 */}
-        <Layout.Section>
-          <Grid>
-            {/* 本月使用情况 */}
-            <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 8, xl: 8 }}>
-              <Card>
-                <Box padding="600">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <Text variant="headingMd" as="h3">
-                      2024年7月1日 - 2024年7月31日
-                    </Text>
-                    <Text variant="bodySm" color="subdued">
-                      创建时间：2024年7月1日
-                    </Text>
-                  </div>
-
-                  <div style={{ marginBottom: '16px' }}>
-                    <Text variant="bodySm" color="subdued">
-                      本月使用情况
-                    </Text>
-                  </div>
-
-                  <DataTable
-                    columnContentTypes={['text', 'text', 'text', 'text']}
-                    headings={['服务类型', '使用量', '使用率', '单价']}
-                    rows={usageTableRows}
-                    footerContent={`当前计划限额内使用`}
-                  />
-                </Box>
-              </Card>
-            </Grid.Cell>
-
-            {/* 最近发票 */}
-            <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 4, xl: 4 }}>
-              <Card>
-                <Box padding="600">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                    <Text variant="headingMd" as="h3">
-                      最近发票
-                    </Text>
-                    <Button 
-                      variant="plain"
-                      icon={ExternalIcon}
-                      onClick={() => navigate('/billing/invoices')}
-                    >
-                      查看全部
-                    </Button>
-                  </div>
-
-                  <div style={{ marginBottom: '24px' }}>
-                    <DataTable
-                      columnContentTypes={['text', 'text', 'text']}
-                      headings={['开票日期', '金额', '状态']}
-                      rows={invoiceTableRows}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text variant="bodySm" color="subdued">
-                      预计收费时间：2024年8月1日
-                    </Text>
-                    <Text variant="headingMd" as="h4">
-                      $29.99
-                    </Text>
-                  </div>
-                </Box>
-              </Card>
-            </Grid.Cell>
-          </Grid>
-        </Layout.Section>
-
-        {/* 快速操作 */}
-        <Layout.Section>
-          <Card>
-            <Box padding="600">
-              <div style={{ marginBottom: '24px' }}>
-                <Text variant="headingMd" as="h3">
-                  快速操作
-                </Text>
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                <Button 
-                  size="large"
-                  onClick={() => navigate('/settings/tax')}
-                >
-                  税费设置
-                </Button>
-                <Button 
-                  size="large"
-                  onClick={() => navigate('/settings/logistics')}
-                >
-                  物流配置
-                </Button>
-                <Button 
-                  size="large"
-                  onClick={() => navigate('/reports')}
-                >
-                  数据报表
-                </Button>
-                <Button 
-                  size="large"
-                  onClick={() => navigate('/help')}
-                >
-                  帮助文档
-                </Button>
-              </div>
-            </Box>
-          </Card>
-        </Layout.Section>
-      </Layout>
-    </Page>
+      {/* 快速操作 - 使用全局样式类 */}
+      <div className="chart-card">
+        <div className="kpi-card">
+          <div style={{ marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', margin: '0 0 8px 0' }}>
+              快速操作
+            </h3>
+          </div>
+          
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gap: '16px' 
+          }}>
+            <button 
+              style={{
+                background: 'var(--brand-primary)',
+                color: 'white',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={() => navigate('/settings/tax')}
+            >
+              税费设置
+            </button>
+            <button 
+              style={{
+                background: 'var(--brand-primary)',
+                color: 'white',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={() => navigate('/settings/logistics')}
+            >
+              物流配置
+            </button>
+            <button 
+              style={{
+                background: 'var(--brand-primary)',
+                color: 'white',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={() => navigate('/reports')}
+            >
+              数据报表
+            </button>
+            <button 
+              style={{
+                background: 'var(--brand-primary)',
+                color: 'white',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={() => navigate('/help')}
+            >
+              帮助文档
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

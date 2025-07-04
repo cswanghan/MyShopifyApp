@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTax-Bridge App Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 16.1 设计基调 & 品牌视觉 & 字体 */
+        :root {
+            --brand-primary: #00C9C8;
+            --info-blue: #006EFF;
+            --warning-orange: #FF7A45;
+            --bg-main: #FFFFFF;
+            --bg-sidebar: #F9FAFB;
+            --bg-workspace: #F3F4F6;
+            --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --text-primary: #1A1C1D;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --form-bg-info: #F2F4F5;
+            --font-family: 'Shopify Sans', -apple-system, BlinkMacSystemFont, '思源黑体 SC', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-workspace);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 16.2 布局框架: SideNav */
+        .sidenav {
+            width: 72px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 24px;
+            transition: width 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            color: var(--brand-primary);
+            margin-bottom: 32px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 56px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--border-radius);
+            color: var(--text-secondary);
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        
+        .nav-item a:hover {
+            background-color: #E5E7EB;
+        }
+
+        .nav-item.active a {
+            background-color: var(--brand-primary);
+            color: white;
+        }
+
+        /* 16.2 布局框架: Workspace */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 16.2 布局框架: TopBar */
+        .topbar {
+            height: 56px;
+            background-color: var(--bg-main);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            flex-shrink: 0;
+        }
+
+        .breadcrumb {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .topbar-actions button {
+            background: var(--brand-primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .topbar-actions button:hover {
+            background: #00A09F;
+        }
+
+        /* 内容区域通用样式 */
+        .content-area {
+            flex-grow: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .content-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+        
+        .page {
+            display: none; /* Hide pages by default */
+        }
+        .page.active {
+            display: block; /* Show active page */
+        }
+
+        .card {
+            background-color: var(--bg-main);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .card-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .card-content {
+            padding: 24px;
+        }
+        
+        /* Dashboard Page Styles */
+        #dashboard-page .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        #dashboard-page .kpi-card {
+             padding: 24px;
+        }
+        #dashboard-page .kpi-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        #dashboard-page .kpi-card .value {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+        #dashboard-page .kpi-card .change {
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        #dashboard-page .change .positive { color: #10B981; }
+        #dashboard-page .change .negative { color: #EF4444; }
+        #dashboard-page .chart-card {
+            margin-top: 24px;
+        }
+        
+        /* Tax Settings Page Styles */
+        #tax-settings-page .settings-layout {
+            display: flex;
+            gap: 24px;
+        }
+        /* PRD 16.2: 双栏表单 */
+        #tax-settings-page .info-column {
+            width: 240px;
+            flex-shrink: 0;
+        }
+        #tax-settings-page .form-column {
+            flex-grow: 1;
+        }
+        #tax-settings-page .info-column .info-box {
+            background-color: var(--form-bg-info); /* PRD 16.3: 浅灰背景 */
+            padding: 16px;
+            border-radius: var(--border-radius);
+        }
+        #tax-settings-page .info-box h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        #tax-settings-page .info-box p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .form-group input[type="text"], .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-group input[type="text"]:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 2px rgba(0, 201, 200, 0.2);
+        }
+        /* PRD 16.3: 上传组件 */
+        .upload-component {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .upload-component:hover {
+            border-color: var(--brand-primary);
+        }
+        .upload-component .icon {
+            color: var(--brand-primary);
+            margin-bottom: 8px;
+        }
+        .upload-component p {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .upload-component span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 响应式断点 */
+        @media (max-width: 768px) {
+            .sidenav {
+                display: none;
+            }
+            .content-area {
+                padding: 16px;
+            }
+            #dashboard-page .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            #tax-settings-page .settings-layout {
+                flex-direction: column;
+            }
+            #tax-settings-page .info-column {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 16.2 布局框架: 侧边栏 (SideNav) -->
+    <nav class="sidenav">
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.2 16.8L22 12L17.2 7.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.8 16.8L2 12L6.8 7.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 22L12 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item active" data-target="dashboard-page" title="仪表盘">
+                <a href="#"><i data-lucide="layout-grid"></i></a>
+            </li>
+            <li class="nav-item" data-target="orders-page" title="订单管理">
+                <a href="#"><i data-lucide="package"></i></a>
+            </li>
+            <li class="nav-item" data-target="tax-settings-page" title="税费设置">
+                <a href="#"><i data-lucide="receipt"></i></a>
+            </li>
+            <li class="nav-item" data-target="logistics-page" title="物流方案">
+                <a href="#"><i data-lucide="send"></i></a>
+            </li>
+            <li class="nav-item" data-target="compliance-page" title="合规申报">
+                 <a href="#"><i data-lucide="file-check-2"></i></a>
+            </li>
+             <li class="nav-item" data-target="account-page" title="账户设置">
+                 <a href="#"><i data-lucide="settings"></i></a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 16.2 布局框架: 右侧工作区 (Workspace) -->
+    <main class="workspace">
+        <!-- 面包屑 TopBar -->
+        <header class="topbar">
+            <div class="breadcrumb">仪表盘</div>
+            <div class="topbar-actions">
+                <button id="top-action-btn">查看报告</button>
+            </div>
+        </header>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <div class="content-inner">
+                
+                <!-- Page: Dashboard -->
+                <div id="dashboard-page" class="page active">
+                    <div class="kpi-grid">
+                        <div class="card kpi-card">
+                            <h3>总订单 (含税)</h3>
+                            <div class="value" id="kpi-value-1">1,820</div>
+                            <div class="change"><span class="positive">▲ 6.2%</span> vs 上月</div>
+                        </div>
+                        <div class="card kpi-card">
+                            <h3>预估总税费 (USD)</h3>
+                            <div class="value">$<span id="kpi-value-2">21,450</span></div>
+                            <div class="change"><span class="positive">▲ 5.8%</span> vs 上月</div>
+                        </div>
+                        <div class="card kpi-card">
+                            <h3>结账转化率提升</h3>
+                            <div class="value">+<span id="kpi-value-3">6.15</span>%</div>
+                            <div class="change"><span style="color: var(--info-blue)">目标: ≥ 6%</span></div>
+                        </div>
+                        <div class="card kpi-card">
+                            <h3>IOSS 自动申报率</h3>
+                            <div class="value" id="kpi-value-4">92.5%</div>
+                            <div class="change"><span class="positive">▲ 12.5%</span> vs 上月</div>
+                        </div>
+                        <div class="card kpi-card">
+                            <h3>物流时效达成率</h3>
+                            <div class="value" id="kpi-value-5">98.1%</div>
+                            <div class="change"><span class="positive">▲ 0.5%</span> vs 上月</div>
+                        </div>
+                        <div class="card kpi-card">
+                            <h3>计算API调用成功率</h3>
+                            <div class="value">99.98%</div>
+                            <div class="change"><span style="color: var(--info-blue)">SLA: ≥ 99.9%</span></div>
+                        </div>
+                    </div>
+                    <div class="card chart-card">
+                        <div class="card-header"><h3>订单模式趋势 (近30天)</h3></div>
+                        <div class="card-content">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page: Tax Settings -->
+                <div id="tax-settings-page" class="page">
+                    <div class="card">
+                        <div class="card-header"><h3>税费计算规则</h3></div>
+                        <div class="card-content">
+                            <div class="settings-layout">
+                                <div class="info-column">
+                                    <div class="info-box">
+                                        <h4>通用设置</h4>
+                                        <p>配置税费计算的基础规则，例如是否将运费和保险费计入完税价格。这些设置将全局生效。</p>
+                                    </div>
+                                </div>
+                                <div class="form-column">
+                                    <div class="form-group">
+                                        <label for="tax-basis">完税价格 (Customs Value) 计算依据</label>
+                                        <select id="tax-basis">
+                                            <option value="cif">商品价格 + 运费 + 保险 (CIF)</option>
+                                            <option value="fob">仅商品价格 (FOB)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="default-hscode">默认 HS Code</label>
+                                        <input type="text" id="default-hscode" placeholder="例如 61091000">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-header" style="border-top: 1px solid var(--border-color);"><h3>结账页面定制</h3></div>
+                         <div class="card-content">
+                            <div class="settings-layout">
+                                <div class="info-column">
+                                    <div class="info-box">
+                                        <h4>Checkout Block 定制</h4>
+                                        <p>上传您的品牌 Logo，它将展示在结账页的税费和物流选项模块中，提升品牌一致性。</p>
+                                    </div>
+                                </div>
+                                <div class="form-column">
+                                    <div class="form-group">
+                                        <label>品牌 Logo</label>
+                                        <div class="upload-component" aria-describedby="upload-hint">
+                                            <div class="icon"><i data-lucide="upload-cloud"></i></div>
+                                            <p>点击上传或拖拽文件到此处</p>
+                                            <span id="upload-hint">PNG, JPG, SVG. 建议尺寸 120x40px.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other pages would go here, e.g., orders, logistics... -->
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- CORE SCRIPT ---
+        document.addEventListener("DOMContentLoaded", () => {
+            // Initialize Lucide Icons
+            lucide.createIcons();
+
+            // --- Page Navigation Logic ---
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+            const breadcrumb = document.querySelector('.breadcrumb');
+            const topActionButton = document.getElementById('top-action-btn');
+
+            const pageConfig = {
+                'dashboard-page': { title: '仪表盘', buttonText: '查看报告' },
+                'tax-settings-page': { title: '税费设置', buttonText: '保存更改' },
+                // Add other pages here
+                'orders-page': { title: '订单管理', buttonText: '导出订单' },
+                'logistics-page': { title: '物流方案', buttonText: '添加线路' },
+                'compliance-page': { title: '合规申报', buttonText: '新建申报' },
+                'account-page': { title: '账户设置', buttonText: '保存' },
+            };
+
+            function switchPage(targetId) {
+                // Update pages
+                pages.forEach(page => {
+                    page.classList.toggle('active', page.id === targetId);
+                });
+
+                // Update nav active state
+                navItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.target === targetId);
+                });
+
+                // Update breadcrumb and button
+                const config = pageConfig[targetId] || { title: '页面未找到', buttonText: '' };
+                breadcrumb.textContent = config.title;
+                topActionButton.textContent = config.buttonText;
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = item.dataset.target;
+                    // For this demo, we only have two pages. For others, show an alert.
+                    if (targetId === 'dashboard-page' || targetId === 'tax-settings-page') {
+                        switchPage(targetId);
+                    } else {
+                        alert(`"${item.title}" 页面正在开发中...`);
+                    }
+                });
+            });
+
+            // --- Dashboard Page Specific Logic ---
+            function initDashboard() {
+                // 1. Animate KPI values
+                const kpi1 = document.getElementById('kpi-value-1');
+                if (kpi1) animateValue(kpi1, 0, 1820, 500);
+                
+                const kpi2 = document.getElementById('kpi-value-2');
+                if(kpi2) animateValue(kpi2, 0, 21450, 500);
+
+                // These require special handling for decimals/percentages
+                const kpi3 = document.getElementById('kpi-value-3');
+                if(kpi3) kpi3.textContent = '6.15';
+                const kpi4 = document.getElementById('kpi-value-4');
+                if(kpi4) kpi4.textContent = '92.5%';
+                const kpi5 = document.getElementById('kpi-value-5');
+                if(kpi5) kpi5.textContent = '98.1%';
+
+
+                // 2. Render Chart
+                const chartCanvas = document.getElementById('trendChart');
+                if (chartCanvas && !chartCanvas.chart) { // Prevent re-initialization
+                    const ctx = chartCanvas.getContext('2d');
+                    chartCanvas.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: Array.from({length: 15}, (_, i) => { // Simplified labels for clarity
+                                const d = new Date();
+                                d.setDate(d.getDate() - (14 - i));
+                                return `${d.getMonth()+1}-${d.getDate()}`;
+                            }),
+                            datasets: [{
+                                label: 'DDP 订单 (含税到门)',
+                                data: [45, 50, 55, 60, 58, 62, 65, 70, 72, 75, 88, 90, 105, 115, 120],
+                                borderColor: 'var(--brand-primary)',
+                                backgroundColor: 'rgba(0, 201, 200, 0.1)',
+                                fill: true, tension: 0.4, pointRadius: 4,
+                            }, {
+                                label: 'DAP 订单 (目的港交)',
+                                data: [14, 13, 12, 11, 10, 9, 10, 8, 7, 6, 5, 4, 3, 2, 1],
+                                borderColor: '#A8B0B9',
+                                backgroundColor: 'rgba(168, 176, 185, 0.1)',
+                                fill: true, tension: 0.4, borderDash: [5, 5],
+                            }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false, height: 300,
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#E5E7EB', borderDash: [2, 4], drawBorder: false }},
+                                x: { grid: { display: false }}
+                            },
+                            plugins: {
+                                legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8 }}
+                            },
+                            interaction: { intersect: false, mode: 'index' },
+                        }
+                    });
+                }
+            }
+            
+            // Initial page load
+            initDashboard();
+
+            // --- Helper Functions ---
+            function animateValue(element, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const current = Math.floor(progress * (end - start) + start);
+                    element.innerHTML = current.toLocaleString('en-US');
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+        });
+    </script>
+</body>
+</html>
