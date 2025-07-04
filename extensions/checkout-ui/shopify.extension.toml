@@ -1,0 +1,25 @@
+# Checkout UI Extensions配置
+name = "checkout-ui"
+type = "checkout_ui_extension"
+handle = "checkout-ui"
+
+[build]
+command = "npm run build"
+path = "dist"
+
+[build.watch]
+watch = ["src/**/*"]
+ignore = ["node_modules/**/*", "dist/**/*"]
+
+[extension_points]
+[[extension_points.entry]]
+target = "purchase.checkout.block.render"
+module = "./src/Checkout.jsx"
+
+[[extension_points.entry]]
+target = "purchase.checkout.delivery-address.render-before"
+module = "./src/TaxBanner.jsx"
+
+[[extension_points.entry]]
+target = "purchase.checkout.shipping-option-list.render-after"
+module = "./src/LogisticsOptions.jsx"

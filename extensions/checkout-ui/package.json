@@ -1,0 +1,19 @@
+{
+  "name": "checkout-ui",
+  "version": "1.0.0",
+  "description": "DTax-Bridge Checkout UI Extensions",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "shopify app build",
+    "dev": "shopify app dev"
+  },
+  "dependencies": {
+    "@shopify/checkout-ui-extensions": "^0.25.0",
+    "@shopify/checkout-ui-extensions-react": "^0.25.0",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@shopify/cli": "^3.45.0",
+    "vite": "^4.3.0"
+  }
+}

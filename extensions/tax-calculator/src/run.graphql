@@ -1,0 +1,53 @@
+query RunInput {
+  cart {
+    buyerIdentity {
+      countryCode
+      customer {
+        id
+      }
+    }
+    lines {
+      id
+      quantity
+      merchandise {
+        ... on ProductVariant {
+          id
+          title
+          price {
+            amount
+            currencyCode
+          }
+          product {
+            id
+            title
+            handle
+            productType
+            vendor
+            tags
+            metafields(first: 10) {
+              edges {
+                node {
+                  key
+                  value
+                  namespace
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    cost {
+      totalAmount {
+        amount
+        currencyCode
+      }
+    }
+  }
+  discountNode {
+    id
+    metafield(namespace: "dtax-bridge", key: "config") {
+      value
+    }
+  }
+}

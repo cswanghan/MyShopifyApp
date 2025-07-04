@@ -1,0 +1,18 @@
+# Shopify Functions税费计算扩展配置
+name = "tax-calculator"
+type = "function"
+handle = "tax-calculator"
+
+[build]
+command = "npm run build"
+path = "dist/index.wasm"
+
+[build.watch]
+watch = ["src/**/*"]
+ignore = ["node_modules/**/*", "dist/**/*"]
+
+[function]
+name = "DTax-Bridge Tax Calculator"
+description = "Cross-border tax and duty calculation for international orders"
+type = "order_discounts"
+input_query = "src/run.graphql"

@@ -1,0 +1,16 @@
+{
+  "name": "tax-calculator",
+  "version": "1.0.0",
+  "description": "Shopify Functions税费计算扩展",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "javy compile src/index.js -o dist/index.wasm",
+    "dev": "shopify app dev"
+  },
+  "dependencies": {
+    "@shopify/shopify-functions": "^1.0.0"
+  },
+  "devDependencies": {
+    "javy": "^0.4.0"
+  }
+}

@@ -1,0 +1,44 @@
+# Shopify App配置文件
+name = "DTax-Bridge"
+client_id = "your-client-id"
+application_url = "https://your-app-url.com"
+embedded = true
+
+[access_scopes]
+# 基础权限
+scopes = "write_products,read_products,write_orders,read_orders,write_shipping,read_shipping,write_customers,read_customers,write_checkouts,read_checkouts,write_draft_orders,read_draft_orders"
+
+[auth]
+redirect_urls = [
+  "https://your-app-url.com/auth/callback",
+  "https://your-app-url.com/auth/shopify/callback"
+]
+
+[webhooks]
+api_version = "2023-10"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "your-dev-store.myshopify.com"
+
+# 包含扩展
+[[extensions]]
+type = "function"
+name = "tax-calculator"
+handle = "tax-calculator"
+
+[[extensions]]
+type = "checkout_ui_extension"
+name = "checkout-ui"
+handle = "checkout-ui"
+
+[extensions.tax-calculator]
+name = "DTax-Bridge Tax Calculator"
+description = "Cross-border tax and duty calculation for international orders"
+
+[extensions.checkout-ui]
+name = "DTax-Bridge Checkout UI"
+description = "Enhanced checkout experience with tax calculation and logistics options"
