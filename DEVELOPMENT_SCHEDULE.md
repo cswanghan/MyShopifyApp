@@ -13,10 +13,10 @@
 #### 🎯 目标: 项目初始化和基础配置
 
 **Day 1-2: 项目搭建**
-- [ ] 创建 Nx Monorepo 项目结构
-- [ ] 配置 TypeScript、ESLint、Prettier
-- [ ] 设置 Git 仓库和 GitHub Actions
-- [ ] 创建基础的 package.json 和配置文件
+- [x] 创建 Nx Monorepo 项目结构
+- [x] 配置 TypeScript、ESLint、Prettier
+- [x] 设置 Git 仓库和 GitHub Actions
+- [x] 创建基础的 package.json 和配置文件
 
 **Day 3-4: Shopify App 初始化**
 - [ ] 创建 Shopify Partner 账户
@@ -364,10 +364,10 @@
 ## 关键里程碑检查点
 
 ### 里程碑 1: 基础设施完成 (第 3 周末)
-- [ ] 开发环境搭建完成
+- [x] 开发环境搭建完成
 - [ ] CI/CD 流水线正常运行
 - [ ] 数据库设计完成
-- [ ] 基础架构代码完成
+- [x] 基础架构代码完成
 
 ### 里程碑 2: MVP 功能完成 (第 10 周末)
 - [ ] 税费计算引擎正常工作
