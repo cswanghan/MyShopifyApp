@@ -216,7 +216,8 @@ export function AppLayout({ children }: AppLayoutProps) {
             { path: '/settings/tax', icon: SettingsIcon, title: '税费设置' },
             { path: '/settings/logistics', icon: DeliveryIcon, title: '物流方案' },
             { path: '/compliance', icon: ProductIcon, title: '合规申报' },
-            { path: '/help', icon: QuestionCircleIcon, title: '账户设置' }
+            { path: '/help', icon: QuestionCircleIcon, title: '帮助中心' },
+            { path: '/reports', icon: ProductIcon, title: '数据报表' }
           ].map((item) => {
             const IconComponent = item.icon
             const isActive = location.pathname === item.path || 
@@ -234,11 +235,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault()
-                    if (item.path === '/orders' || item.path === '/compliance') {
-                      alert(`"${item.title}" 页面正在开发中...`)
-                    } else {
-                      handleNavigate(item.path)
-                    }
+                    handleNavigate(item.path)
                   }}
                   style={{
                     display: 'flex',

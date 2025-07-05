@@ -2,8 +2,12 @@ import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
 import { Dashboard } from './pages/Dashboard'
+import { Orders } from './pages/Orders'
 import { TaxSettings } from './pages/TaxSettings'
 import { LogisticsSettings } from './pages/LogisticsSettings'
+import { Compliance } from './pages/Compliance'
+import { Reports } from './pages/Reports'
+import { Help } from './pages/Help'
 
 function App() {
   return (
@@ -11,8 +15,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/orders" element={<Orders />} />
         <Route path="/settings/tax" element={<TaxSettings />} />
         <Route path="/settings/logistics" element={<LogisticsSettings />} />
+        <Route path="/compliance" element={<Compliance />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/help" element={<Help />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </AppLayout>
