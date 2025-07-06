@@ -1,13 +1,13 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
-import { Dashboard } from './pages/Dashboard'
-import { Orders } from './pages/Orders'
-import { TaxSettings } from './pages/TaxSettings'
-import { LogisticsSettings } from './pages/LogisticsSettings'
-import { Compliance } from './pages/Compliance'
-import { Reports } from './pages/Reports'
-import { Help } from './pages/Help'
+import { Dashboard } from './pages/Dashboard-Polaris'
+import { Orders } from './pages/Orders-Polaris'
+import { TaxSettings } from './pages/TaxSettings-Polaris'
+import { LogisticsSettings } from './pages/LogisticsSettings-Polaris'
+import { Compliance } from './pages/Compliance-Polaris'
+import { Reports } from './pages/Reports-Polaris'
+import { Help } from './pages/Help-Polaris'
 
 function App() {
   return (
