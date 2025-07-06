@@ -94,33 +94,256 @@ body {
   border-top: 1px solid var(--p-color-border-subdued);
 }
 
-/* Polaris按钮系统 */
+/* Polaris按钮系统 - 增强版 */
 .polaris-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 2.25rem;
+  min-width: 2.25rem;
+  margin: 0;
   padding: var(--p-space-1) var(--p-space-2);
+  background: var(--p-color-bg-surface);
+  border: 1px solid var(--p-color-border);
   border-radius: var(--p-border-radius-base);
+  box-shadow: 0 1px 0 rgba(22, 29, 37, 0.05);
+  color: var(--p-color-text);
+  cursor: pointer;
+  font-family: var(--p-font-family-sans);
   font-size: var(--p-font-size-100);
   font-weight: 500;
+  line-height: 1;
+  text-align: center;
   text-decoration: none;
-  cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
-  min-height: 44px; /* 可访问性要求 */
-  font-family: var(--p-font-family-sans);
+  user-select: none;
+  position: relative;
+  outline: none;
+}
+
+.polaris-button:hover {
+  background: var(--p-color-bg-subdued);
+  border-color: var(--p-color-border);
+  color: var(--p-color-text);
+  text-decoration: none;
+}
+
+.polaris-button:focus {
+  border-color: var(--p-color-bg-primary);
+  box-shadow: 0 0 0 2px var(--p-color-bg-primary);
+}
+
+.polaris-button:active {
+  background: var(--p-color-bg-subdued);
+  box-shadow: 0 1px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 rgba(22, 29, 37, 0.15);
 }
 
 .polaris-button--primary {
-  background-color: var(--p-color-bg-primary);
-  color: white;
+  background: var(--p-color-bg-primary);
   border-color: var(--p-color-bg-primary);
+  color: #ffffff;
 }
 
 .polaris-button--primary:hover {
-  background-color: #255dab;
-  border-color: #255dab;
-  transform: translateY(-1px);
+  background: #1f5cb0;
+  border-color: #1f5cb0;
+  color: #ffffff;
+}
+
+.polaris-button--primary:focus {
+  border-color: #1f5cb0;
+  box-shadow: 0 0 0 2px rgba(44, 110, 203, 0.4);
+}
+
+.polaris-button--primary:active {
+  background: #1a4d96;
+  border-color: #1a4d96;
+  box-shadow: 0 1px 0 rgba(22, 29, 37, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.polaris-button--critical {
+  background: var(--p-color-text-critical);
+  border-color: var(--p-color-text-critical);
+  color: #ffffff;
+}
+
+.polaris-button--critical:hover {
+  background: #c72e0d;
+  border-color: #c72e0d;
+  color: #ffffff;
+}
+
+.polaris-button--default {
+  /* 默认按钮样式已在基础类中定义 */
+}
+
+.polaris-button--plain {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--p-color-bg-primary);
+}
+
+.polaris-button--plain:hover {
+  background: var(--p-color-bg-subdued);
+  border: none;
+  color: var(--p-color-bg-primary);
+}
+
+.polaris-button--disabled {
+  background: var(--p-color-bg-subdued);
+  border-color: var(--p-color-border-subdued);
+  color: var(--p-color-text-subdued);
+  cursor: not-allowed;
+}
+
+.polaris-button--disabled:hover,
+.polaris-button--disabled:focus,
+.polaris-button--disabled:active {
+  background: var(--p-color-bg-subdued);
+  border-color: var(--p-color-border-subdued);
+  color: var(--p-color-text-subdued);
+  box-shadow: none;
+}
+
+/* 骨架屏和加载状态 */
+.polaris-skeleton {
+  background: linear-gradient(90deg, var(--p-color-bg-subdued) 25%, var(--p-color-border-subdued) 50%, var(--p-color-bg-subdued) 75%);
+  background-size: 200% 100%;
+  animation: polaris-skeleton-loading 1.5s infinite;
+  border-radius: var(--p-border-radius-base);
+}
+
+@keyframes polaris-skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.polaris-loading-bar {
+  height: 2px;
+  background: var(--p-color-bg-primary);
+  animation: polaris-loading-progress 2s infinite;
+  border-radius: 1px;
+}
+
+@keyframes polaris-loading-progress {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+
+/* 增强的数据表格 */
+.polaris-data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--p-color-bg-surface);
+  border-radius: var(--p-border-radius-base);
+  overflow: hidden;
+  box-shadow: var(--p-shadow-card);
+}
+
+.polaris-data-table__header {
+  background: var(--p-color-bg-subdued);
+}
+
+.polaris-data-table__cell {
+  padding: var(--p-space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--p-color-border-subdued);
+  font-size: var(--p-font-size-100);
+  line-height: 1.4;
+}
+
+.polaris-data-table__header .polaris-data-table__cell {
+  font-weight: 600;
+  color: var(--p-color-text-subdued);
+  border-bottom: 2px solid var(--p-color-border);
+}
+
+.polaris-data-table__row:hover .polaris-data-table__cell {
+  background: var(--p-color-bg-subdued);
+}
+
+/* 响应式设计优化 */
+@media (max-width: 767px) {
+  .polaris-data-table {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .polaris-card__section {
+    padding: var(--p-space-2);
+  }
+  
+  /* 移动端按钮优化 */
+  .polaris-button {
+    min-height: 44px; /* 满足触摸目标最小尺寸 */
+    padding: var(--p-space-2) var(--p-space-3);
+  }
+}
+
+/* KPI 卡片增强动画 */
+.polaris-fade-in {
+  animation: polaris-fade-in 0.6s ease-out;
+}
+
+@keyframes polaris-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.polaris-slide-up {
+  animation: polaris-slide-up 0.4s ease-out;
+}
+
+@keyframes polaris-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 通知和提示增强 */
+.polaris-banner {
+  border-radius: var(--p-border-radius-base);
+  padding: var(--p-space-3);
+  margin-bottom: var(--p-space-2);
+  border-left: 4px solid;
+}
+
+.polaris-banner--success {
+  background: var(--p-color-bg-surface-success);
+  border-color: var(--p-color-text-success);
+  color: var(--p-color-text-success);
+}
+
+.polaris-banner--warning {
+  background: var(--p-color-bg-surface-warning);
+  border-color: #b98900;
+  color: #b98900;
+}
+
+.polaris-banner--critical {
+  background: var(--p-color-bg-surface-critical);
+  border-color: var(--p-color-text-critical);
+  color: var(--p-color-text-critical);
+}
+
+.polaris-banner--info {
+  background: var(--p-color-bg-surface-info);
+  border-color: var(--p-color-text-info);
+  color: var(--p-color-text-info);
 }
 
 .polaris-button--primary:focus {
