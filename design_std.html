@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式Shopify Polaris设计规范</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Polaris Neutrals & Semantics -->
+    <!-- Application Structure Plan: A single-page, vertically scrolling application with a sticky top navigation bar. The structure is thematic, guiding the user from high-level philosophy to specific, interactive component examples. Sections include: 1) Philosophy (core principles), 2) Visual Language (interactive color/typography showcases), 3) Layout System (interactive toggles to demonstrate grid/page layouts), 4) Interactive Components (hands-on examples of forms, tables, feedback elements), and 5) Checklist. This task-oriented flow is more intuitive for a developer learning a design system than a linear document, as it allows them to jump directly to the topic of interest and interact with live examples. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Polaris Responsive Grid Breakpoints Table -> Goal: Compare/Inform -> Viz/Presentation: Interactive Bar Chart (Chart.js) -> Interaction: Hovering over bars shows detailed viewport widths. -> Justification: A chart is more visually engaging and easier to interpret for comparing quantitative breakpoints than a static table. It transforms data into an easily digestible visual format.
+        - Report Info: Color Tokens & Usage -> Goal: Inform/Organize -> Viz/Presentation: Dynamic Grid of Color Swatches (HTML/CSS/JS) -> Interaction: Clicking a swatch copies the token name and displays its semantic purpose in a central text block. -> Justification: This interactive swatch grid makes the color system tangible and immediately useful for developers, providing instant feedback and practical information.
+        - Report Info: Component Examples (Forms, Tables) -> Goal: Inform/Interact -> Viz/Presentation: Live, interactive HTML components -> Interaction: Users can type in text fields, click buttons, see validation states, and toggle table views. -> Justification: Direct interaction is the most effective way to understand how components behave, far superior to static images or code snippets. It directly translates the report's implementation details into a hands-on experience.
+        - Report Info: Design Principles -> Goal: Inform/Organize -> Viz/Presentation: Styled cards with icons (HTML/Tailwind) -> Interaction: Simple, static display. -> Justification: High-level principles are best presented clearly and concisely. The focus here is on readability and impact, not complex interaction.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* Polaris Page Background */
+            color: #202223; /* Polaris Text Color */
+        }
+        .polaris-card {
+            background-color: white;
+            border-radius: 0.5rem; /* lg */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #E1E3E5;
+        }
+        .polaris-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* md */
+            font-weight: 500;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+        }
+        .polaris-button-primary {
+            background-color: #2c6ecb; /* Indigo */
+            color: white;
+            border-color: #2c6ecb;
+        }
+        .polaris-button-primary:hover {
+            background-color: #255dab;
+        }
+        .polaris-button-default {
+            background-color: white;
+            color: #202223;
+            border-color: #c9cccf;
+        }
+        .polaris-button-default:hover {
+            background-color: #f6f6f7;
+        }
+        .polaris-badge {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .polaris-badge-success { background-color: #DFFCF0; color: #008060; }
+        .polaris-badge-critical { background-color: #FFEDEB; color: #D82C0D; }
+        .polaris-badge-default { background-color: #E4E5E7; color: #5C5F62; }
+
+        .nav-item.active {
+            color: #2c6ecb;
+            font-weight: 600;
+            border-bottom-color: #2c6ecb;
+        }
+        .nav-item {
+            border-bottom: 2px solid transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">交互式Polaris设计规范</h1>
+                </div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#philosophy" class="nav-item text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">设计哲学</a>
+                    <a href="#visuals" class="nav-item text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">视觉语言</a>
+                    <a href="#layouts" class="nav-item text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">布局系统</a>
+                    <a href="#components" class="nav-item text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">核心组件</a>
+                    <a href="#checklist" class="nav-item text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">最终清单</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- Section 1: Philosophy -->
+        <section id="philosophy" class="scroll-mt-24 mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">设计哲学: 为赢得信任而构建</h2>
+            <p class="text-lg text-gray-600 mb-8">成功的Shopify应用感觉就像是Shopify后台的原生部分。这不仅仅是为了美观，更是为了通过提供一致且可预测的体验来建立商家的信任并提高其工作效率。以下是Polaris系统的核心原则。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="polaris-card p-6 text-center">
+                    <div class="text-4xl mb-3">🤝</div>
+                    <h3 class="text-lg font-semibold mb-2">商家优先</h3>
+                    <p class="text-sm text-gray-600">每个设计决策都必须首先衡量其对商家经营业务能力的影响。</p>
+                </div>
+                <div class="polaris-card p-6 text-center">
+                    <div class="text-4xl mb-3">🚀</div>
+                    <h3 class="text-lg font-semibold mb-2">赋能而非压倒</h3>
+                    <p class="text-sm text-gray-600">提供强大的工具，同时避免创造复杂或令人困惑的界面。</p>
+                </div>
+                <div class="polaris-card p-6 text-center">
+                    <div class="text-4xl mb-3">🧩</div>
+                    <h3 class="text-lg font-semibold mb-2">构建内聚体验</h3>
+                    <p class="text-sm text-gray-600">确保界面的所有部分都感觉浑然一体，仿佛出自同一设计语言。</p>
+                </div>
+                <div class="polaris-card p-6 text-center">
+                    <div class="text-4xl mb-3">✨</div>
+                    <h3 class="text-lg font-semibold mb-2">精致而非装饰</h3>
+                    <p class="text-sm text-gray-600">专注于简洁、功能性的美学，优先考虑清晰度和效率。</p>
+                </div>
+            </div>
+        </section>
+        
+        <hr class="my-16 border-gray-200">
+
+        <!-- Section 2: Visual Language -->
+        <section id="visuals" class="scroll-mt-24 mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">视觉语言: Polaris的设计令牌</h2>
+            <p class="text-lg text-gray-600 mb-8">Polaris使用“设计令牌”来确保视觉一致性。这些令牌是预定义的变量，用于颜色、间距和排版，而不是硬编码的值。这使得应用能够自动适应Shopify未来的视觉更新。</p>
+            
+            <div class="polaris-card p-6">
+                <h3 class="text-xl font-semibold mb-4">交互式色彩系统</h3>
+                <p class="text-gray-600 mb-6">Polaris的颜色是有语义的，用于传达信息。点击下面的色块可以查看其用途，并模拟复制令牌名称。</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                         <div id="color-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <!-- Colors will be injected by JS -->
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-6 flex flex-col justify-center items-center text-center border">
+                        <div id="color-preview" class="w-24 h-24 rounded-full mb-4 transition-colors duration-300" style="background-color: #AEB4B9;"></div>
+                        <h4 id="color-name" class="text-lg font-semibold">--p-color-bg-subdued</h4>
+                        <p id="color-description" class="text-sm text-gray-600 mt-2">用于次要或非活动元素的背景。请点击左侧色块进行探索。</p>
+                        <div id="copy-feedback" class="mt-4 text-sm text-green-600 font-medium opacity-0 transition-opacity">已复制!</div>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-12 mb-4">排版层级</h3>
+                <p class="text-gray-600 mb-6">清晰的视觉层级有助于引导用户视线，提升可读性。Polaris使用标准的系统UI字体，无需加载外部字体库。</p>
+                <div class="space-y-4 p-6 border rounded-lg bg-gray-50">
+                    <div><span class="text-4xl font-bold">页面标题 (Heading 2XL)</span></div>
+                    <div><span class="text-2xl font-semibold">卡片标题 (Heading XL)</span></div>
+                    <div><span class="text-lg font-medium">段落标题 (Heading LG)</span></div>
+                    <div><p class="text-base">这是用于长篇内容的正文文本 (Body MD)。它被优化以获得最佳的可读性。</p></div>
+                    <div><p class="text-sm text-gray-600">这是辅助文本或说明文字 (Body SM)。用于提供附加信息而不会分散用户注意力。</p></div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-gray-200">
+
+        <!-- Section 3: Layout System -->
+        <section id="layouts" class="scroll-mt-24 mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">布局系统: 构建应用的骨架</h2>
+            <p class="text-lg text-gray-600 mb-8">一个结构清晰的布局是良好用户体验的基础。Polaris提供了一套灵活的布局组件和响应式网格系统，以确保在所有设备上都能提供一致的体验。</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="polaris-card p-6">
+                    <h3 class="text-xl font-semibold mb-4">响应式断点</h3>
+                    <p class="text-gray-600 mb-6">Polaris定义了多个断点来适配不同屏幕尺寸。下面的图表可视化了这些断点及其推荐的应用主体宽度。</p>
+                    <div class="chart-container relative h-80 w-full max-w-xl mx-auto">
+                        <canvas id="breakpointsChart"></canvas>
+                    </div>
+                </div>
+                 <div class="polaris-card p-6">
+                    <h3 class="text-xl font-semibold mb-4">交互式布局模式</h3>
+                    <p class="text-gray-600 mb-6">切换下面的按钮来查看Polaris中最常见的布局模式。观察内容区域如何根据您的选择重新排列。</p>
+                    <div class="flex space-x-2 mb-6 border-b pb-4">
+                        <button onclick="setLayout('single')" class="layout-btn polaris-button polaris-button-primary">单列布局</button>
+                        <button onclick="setLayout('two-column')" class="layout-btn polaris-button polaris-button-default">双列布局</button>
+                    </div>
+                    <div id="layout-demo-area" class="bg-gray-100 p-4 rounded-lg border min-h-[20rem] transition-all duration-300">
+                        <!-- Layout demo content will be injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <hr class="my-16 border-gray-200">
+
+        <!-- Section 4: Core Components -->
+        <section id="components" class="scroll-mt-24 mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">核心组件: 与用户交互</h2>
+            <p class="text-lg text-gray-600 mb-8">组件是构建用户界面的基石。以下是Shopify应用中最常用的一些交互式组件示例。</p>
+            
+            <div class="space-y-8">
+                <!-- Forms -->
+                <div class="polaris-card">
+                    <div class="p-6 border-b">
+                        <h3 class="text-xl font-semibold">表单与输入</h3>
+                        <p class="text-gray-600 mt-1">表单用于收集商家输入。Polaris组件内置了验证状态和错误提示。</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="productName" class="block text-sm font-medium text-gray-700 mb-1">商品名称</label>
+                                <input type="text" id="productName" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="例如 冬季羊毛衫">
+                            </div>
+                            <div>
+                                <label for="productType" class="block text-sm font-medium text-gray-700 mb-1">商品类型</label>
+                                <select id="productType" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <option>服装</option>
+                                    <option>家居</option>
+                                    <option>电子产品</option>
+                                </select>
+                            </div>
+                        </div>
+                         <div class="space-y-4">
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱地址 (带验证)</label>
+                                <input type="email" id="email" oninput="validateEmail(this)" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="name@example.com">
+                                <p id="email-error" class="text-xs text-red-600 mt-1 hidden">请输入有效的邮箱地址。</p>
+                            </div>
+                            <div class="flex items-center pt-2">
+                                <input id="publish" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="publish" class="ml-2 block text-sm text-gray-900">立即发布到店铺</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Tables -->
+                <div class="polaris-card">
+                     <div class="p-6 border-b">
+                        <h3 class="text-xl font-semibold">数据显示: IndexTable</h3>
+                        <p class="text-gray-600 mt-1">IndexTable 是为管理资源列表（如商品、订单）而设计的强大组件，内置了选择、排序和批量操作等功能。</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 w-12"><input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded"></th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">库存</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="p-4"><input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:underline cursor-pointer">冬季羊毛衫</td>
+                                    <td class="px-6 py-4 whitespace-nowrap"><span class="polaris-badge polaris-badge-success">已发布</span></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">25 件</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4"><input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:underline cursor-pointer">经典款咖啡杯</td>
+                                    <td class="px-6 py-4 whitespace-nowrap"><span class="polaris-badge polaris-badge-default">草稿</span></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">150 件</td>
+                                </tr>
+                                 <tr>
+                                    <td class="p-4"><input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:underline cursor-pointer">智能手表</td>
+                                    <td class="px-6 py-4 whitespace-nowrap"><span class="polaris-badge polaris-badge-critical">缺货</span></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0 件</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="polaris-card p-6">
+                    <h3 class="text-xl font-semibold mb-4">用户引导与反馈</h3>
+                    <p class="text-gray-600 mb-6">有效的反馈能让用户了解操作的结果。Polaris 提供了多种组件来引导用户和提供清晰的反馈。</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                        <div class="space-y-4">
+                            <h4 class="font-medium">按钮 (Buttons)</h4>
+                            <div class="flex flex-wrap gap-4">
+                                <button class="polaris-button polaris-button-primary">主要操作</button>
+                                <button class="polaris-button polaris-button-default">默认操作</button>
+                                <button class="polaris-button polaris-button-default text-red-600 border-red-300 hover:bg-red-50">危险操作</button>
+                            </div>
+                        </div>
+                         <div class="space-y-4">
+                            <h4 class="font-medium">横幅通知 (Banners)</h4>
+                            <div id="banner-container" class="space-y-4">
+                                <!-- Banner injected by JS -->
+                            </div>
+                             <div class="flex flex-wrap gap-4">
+                                <button onclick="showBanner('success')" class="polaris-button polaris-button-default">显示成功</button>
+                                <button onclick="showBanner('critical')" class="polaris-button polaris-button-default">显示错误</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <hr class="my-16 border-gray-200">
+
+        <!-- Section 5: Checklist -->
+        <section id="checklist" class="scroll-mt-24">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">“为Shopify而生”设计审查清单</h2>
+            <p class="text-lg text-gray-600 mb-8">在提交您的应用前，请使用此清单进行自查，以确保应用在设计上符合Shopify的高质量标准。</p>
+            <div class="polaris-card p-6">
+                <ul class="space-y-4">
+                    <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">✓</span><div><strong class="font-semibold">遵循 Polaris:</strong> 应用是否主要使用 Polaris 组件、令牌和布局模式来构建其界面？</div></li>
+                    <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">✓</span><div><strong class="font-semibold">完全响应式:</strong> 应用在所有官方断点上是否都能提供清晰、可用的体验？</div></li>
+                    <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">✓</span><div><strong class="font-semibold">可访问性达标:</strong> 所有交互元素是否支持键盘导航？色彩对比度是否足够？非文本内容是否有替代文本？</div></li>
+                    <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">✓</span><div><strong class="font-semibold">清晰的视觉层级:</strong> 页面是否有清晰的标题和正文层级，易于浏览？</div></li>
+                     <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">✓</span><div><strong class="font-semibold">直观易用:</strong> 应用的核心功能和导航路径是否对新用户来说直观且易于理解？</div></li>
+                     <li class="flex items-start"><span class="text-green-500 mr-3 mt-1">✓</span><div><strong class="font-semibold">性能表现:</strong> 应用加载速度是否足够快，交互是否流畅？</div></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Breakpoints Chart
+            const ctx = document.getElementById('breakpointsChart').getContext('2d');
+            const breakpointsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['xs', 'sm', 'md', 'lg', 'xl'],
+                    datasets: [{
+                        label: '最大视口宽度 (px)',
+                        data: [489, 767, 1039, 1399, 1440], // Using max width for visualization, xl is min
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if(context.label === 'xl') {
+                                       return '最小视口宽度: 1440px';
+                                    }
+                                    return label + context.formattedValue + 'px';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '视口宽度 (px)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Color System Interaction
+            const colors = [
+                { name: '--p-color-text-critical', hex: '#d82c0d', description: '用于错误文本或表示严重状态。' },
+                { name: '--p-color-text-success', hex: '#008060', description: '用于表示成功操作的文本。' },
+                { name: '--p-color-bg-primary', hex: '#2c6ecb', description: '用于主要号召性用语按钮的背景。' },
+                { name: '--p-color-text-subdued', hex: '#6d7175', description: '用于次要信息或辅助文本。' },
+                { name: '--p-color-border', hex: '#c9cccf', description: '用于组件的默认边框。' },
+                { name: '--p-color-bg-surface-success', hex: '#DFFCF0', description: '用于成功状态横幅的背景。' },
+                { name: '--p-color-bg-surface-critical', hex: '#FFEDEB', description: '用于错误状态横幅的背景。'},
+                { name: '--p-color-text-info', hex: '#007a82', description: '用于信息性横幅中的文本。'}
+            ];
+            const colorGrid = document.getElementById('color-grid');
+            const colorPreview = document.getElementById('color-preview');
+            const colorName = document.getElementById('color-name');
+            const colorDescription = document.getElementById('color-description');
+            const copyFeedback = document.getElementById('copy-feedback');
+
+            colors.forEach(color => {
+                const swatch = document.createElement('div');
+                swatch.className = 'w-full h-12 rounded-md cursor-pointer border border-gray-200 transition-transform hover:scale-110';
+                swatch.style.backgroundColor = color.hex;
+                swatch.addEventListener('click', () => {
+                    colorPreview.style.backgroundColor = color.hex;
+                    colorName.textContent = color.name;
+                    colorDescription.textContent = color.description;
+                    
+                    navigator.clipboard.writeText(color.name);
+                    copyFeedback.classList.remove('opacity-0');
+                    setTimeout(() => copyFeedback.classList.add('opacity-0'), 2000);
+                });
+                colorGrid.appendChild(swatch);
+            });
+
+            // Layout Demo
+            setLayout('single');
+
+            // Navigation scroll spy
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href').includes(current)) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        function setLayout(layoutType) {
+            const demoArea = document.getElementById('layout-demo-area');
+            const layoutBtns = document.querySelectorAll('.layout-btn');
+            layoutBtns.forEach(btn => {
+                btn.classList.remove('polaris-button-primary');
+                btn.classList.add('polaris-button-default');
+            });
+            const activeBtn = document.querySelector(`.layout-btn[onclick="setLayout('${layoutType}')"]`);
+            activeBtn.classList.add('polaris-button-primary');
+            activeBtn.classList.remove('polaris-button-default');
+            
+            let content = '';
+            if (layoutType === 'single') {
+                content = `
+                    <div class="space-y-4">
+                        <div class="polaris-card p-4">单列布局卡片 1</div>
+                        <div class="polaris-card p-4">单列布局卡片 2</div>
+                    </div>`;
+            } else if (layoutType === 'two-column') {
+                content = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2 space-y-4">
+                            <div class="polaris-card p-4">主内容区</div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="polaris-card p-4">侧边栏</div>
+                        </div>
+                    </div>`;
+            }
+            demoArea.innerHTML = content;
+        }
+
+        function validateEmail(input) {
+            const emailError = document.getElementById('email-error');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (input.value && !emailRegex.test(input.value)) {
+                emailError.classList.remove('hidden');
+                input.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+            } else {
+                emailError.classList.add('hidden');
+                input.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+            }
+        }
+
+        function showBanner(type) {
+            const container = document.getElementById('banner-container');
+            let bannerHTML = '';
+            if (type === 'success') {
+                bannerHTML = `
+                <div class="p-4 rounded-md bg-green-50 border border-green-200">
+                    <div class="flex">
+                        <div class="flex-shrink-0 text-green-500 mt-0.5">
+                            <span>✔</span>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-green-800">操作成功</h3>
+                            <div class="mt-2 text-sm text-green-700">
+                                <p>您的商品已成功保存。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            } else if (type === 'critical') {
+                 bannerHTML = `
+                 <div class="p-4 rounded-md bg-red-50 border border-red-200">
+                    <div class="flex">
+                        <div class="flex-shrink-0 text-red-500 mt-0.5">
+                           <span>✖</span>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">发生错误</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <p>无法保存商品，请检查您的输入。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = bannerHTML;
+        }
+
+    </script>
+</body>
+</html>
