@@ -1,0 +1,599 @@
+// DTax-Bridge Database Schema
+// 基于 Prisma ORM 的数据库定义
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 店铺模型
+model Shop {
+  id               String   @id @default(cuid())
+  shopifyId        String   @unique @map("shopify_id")
+  domain           String   @unique
+  name             String
+  email            String
+  phone            String?
+  
+  // 地理信息
+  country          String
+  province         String?
+  city             String?
+  timezone         String   @default("UTC")
+  currency         String   @default("USD")
+  
+  // 计划和状态
+  plan             String
+  isActive         Boolean  @default(true) @map("is_active")
+  isTest           Boolean  @default(false) @map("is_test")
+  
+  // 认证信息
+  accessToken      String   @map("access_token")
+  scope            String[] @default([])
+  
+  // 安装信息
+  installedAt      DateTime @default(now()) @map("installed_at")
+  uninstalledAt    DateTime? @map("uninstalled_at")
+  lastSyncAt       DateTime? @map("last_sync_at")
+  
+  // 时间戳
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  users            User[]
+  orders           Order[]
+  settings         ShopSettings[]
+  sessions         UserSession[]
+  complianceReports ComplianceReport[]
+  auditLogs        AuditLog[]
+
+  @@map("shops")
+  @@index([shopifyId])
+  @@index([domain])
+  @@index([isActive])
+  @@index([installedAt])
+}
+
+// 用户模型
+model User {
+  id              String   @id @default(cuid())
+  email           String
+  name            String
+  phone           String?
+  avatar          String?
+  
+  // 认证信息
+  passwordHash    String?  @map("password_hash")
+  
+  // 状态
+  isActive        Boolean  @default(true) @map("is_active")
+  emailVerified   Boolean  @default(false) @map("email_verified")
+  
+  // 登录信息
+  lastLoginAt     DateTime? @map("last_login_at")
+  loginCount      Int      @default(0) @map("login_count")
+  
+  // 时间戳
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  shopId          String   @map("shop_id")
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  roles           UserRole[]
+  permissions     UserPermission[]
+  sessions        UserSession[]
+  auditLogs       AuditLog[]
+
+  @@map("users")
+  @@unique([email, shopId])
+  @@index([shopId])
+  @@index([email])
+  @@index([isActive])
+  @@index([lastLoginAt])
+}
+
+// 用户角色模型
+model UserRole {
+  id          String    @id @default(cuid())
+  role        String    // owner, admin, manager, operator, viewer, accountant, logistics
+  assignedBy  String?   @map("assigned_by")
+  assignedAt  DateTime  @default(now()) @map("assigned_at")
+  expiresAt   DateTime? @map("expires_at")
+  
+  // 时间戳
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  // 关联关系
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_roles")
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
+  @@index([expiresAt])
+}
+
+// 用户权限模型
+model UserPermission {
+  id          String    @id @default(cuid())
+  permission  String
+  resource    String?   // 可选的资源限制
+  assignedBy  String?   @map("assigned_by")
+  assignedAt  DateTime  @default(now()) @map("assigned_at")
+  expiresAt   DateTime? @map("expires_at")
+  
+  // 时间戳
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  // 关联关系
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_permissions")
+  @@unique([userId, permission, resource])
+  @@index([userId])
+  @@index([permission])
+  @@index([expiresAt])
+}
+
+// 用户会话模型
+model UserSession {
+  id           String   @id @default(cuid())
+  sessionId    String   @unique @map("session_id")
+  
+  // 会话信息
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  
+  // 状态
+  isActive     Boolean  @default(true) @map("is_active")
+  expiresAt    DateTime @map("expires_at")
+  lastActiveAt DateTime @default(now()) @map("last_active_at")
+  
+  // 元数据
+  metadata     Json?
+  
+  // 时间戳
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shopId       String   @map("shop_id")
+  shop         Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+  @@index([sessionId])
+  @@index([userId])
+  @@index([shopId])
+  @@index([expiresAt])
+  @@index([isActive])
+}
+
+// 店铺设置模型
+model ShopSettings {
+  id          String  @id @default(cuid())
+  category    String  // tax, logistics, compliance, notification, general
+  key         String
+  value       Json
+  description String?
+  isPublic    Boolean @default(false) @map("is_public")
+  updatedBy   String? @map("updated_by")
+  
+  // 时间戳
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  shopId      String   @map("shop_id")
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@map("shop_settings")
+  @@unique([shopId, category, key])
+  @@index([shopId])
+  @@index([category])
+  @@index([key])
+}
+
+// 订单模型
+model Order {
+  id                  String   @id @default(cuid())
+  shopifyOrderId      String   @unique @map("shopify_order_id")
+  orderNumber         String   @map("order_number")
+  
+  // 客户信息
+  customerId          String?  @map("customer_id")
+  customerEmail       String   @map("customer_email")
+  customerName        String   @map("customer_name")
+  customerPhone       String?  @map("customer_phone")
+  
+  // 订单状态
+  status              String   @default("pending") // pending, processing, shipped, delivered, cancelled
+  fulfillmentStatus   String?  @map("fulfillment_status") // pending, partial, fulfilled
+  financialStatus     String   @map("financial_status") // pending, paid, partially_paid, refunded, voided
+  
+  // 金额信息
+  totalAmount         Decimal  @map("total_amount") @db.Decimal(10, 2)
+  subtotalAmount      Decimal  @map("subtotal_amount") @db.Decimal(10, 2)
+  taxAmount           Decimal  @map("tax_amount") @db.Decimal(10, 2)
+  shippingAmount      Decimal  @map("shipping_amount") @db.Decimal(10, 2)
+  discountAmount      Decimal  @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  currency            String   @default("USD")
+  
+  // 地址信息 (存储为JSON)
+  billingAddress      Json     @map("billing_address")
+  shippingAddress     Json     @map("shipping_address")
+  
+  // 时间信息
+  orderDate           DateTime @map("order_date")
+  processedAt         DateTime? @map("processed_at")
+  shippedAt           DateTime? @map("shipped_at")
+  deliveredAt         DateTime? @map("delivered_at")
+  cancelledAt         DateTime? @map("cancelled_at")
+  
+  // 元数据
+  metadata            Json?
+  
+  // 时间戳
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  shopId              String   @map("shop_id")
+  shop                Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  orderItems          OrderItem[]
+  taxCalculations     TaxCalculation[]
+  shippingCalculations ShippingCalculation[]
+  complianceReports   ComplianceOrderReport[]
+
+  @@map("orders")
+  @@index([shopifyOrderId])
+  @@index([shopId])
+  @@index([orderNumber])
+  @@index([status])
+  @@index([orderDate])
+  @@index([customerEmail])
+}
+
+// 订单商品模型
+model OrderItem {
+  id              String  @id @default(cuid())
+  productId       String  @map("product_id")
+  variantId       String? @map("variant_id")
+  sku             String
+  title           String
+  variantTitle    String? @map("variant_title")
+  
+  // 数量和价格
+  quantity        Int
+  price           Decimal @db.Decimal(10, 2)
+  compareAtPrice  Decimal? @map("compare_at_price") @db.Decimal(10, 2)
+  
+  // 分类信息
+  hsCode          String? @map("hs_code")
+  category        String?
+  
+  // 重量和尺寸
+  weight          Decimal? @db.Decimal(8, 3)
+  weightUnit      String?  @map("weight_unit")
+  
+  // 时间戳
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  orderId         String   @map("order_id")
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  taxCalculations TaxCalculation[]
+
+  @@map("order_items")
+  @@index([orderId])
+  @@index([productId])
+  @@index([sku])
+  @@index([hsCode])
+}
+
+// 税费计算模型
+model TaxCalculation {
+  id                 String  @id @default(cuid())
+  calculationType    String  @map("calculation_type") // order, item, shipping
+  destinationCountry String  @map("destination_country")
+  destinationProvince String? @map("destination_province")
+  
+  // 税费类型
+  taxType            String  @map("tax_type") // vat, duty, excise, gst, pst, hst
+  taxRate            Decimal @map("tax_rate") @db.Decimal(5, 4)
+  
+  // 计算金额
+  taxableAmount      Decimal @map("taxable_amount") @db.Decimal(10, 2)
+  taxAmount          Decimal @map("tax_amount") @db.Decimal(10, 2)
+  
+  // 计算详情
+  calculationMethod  String  @map("calculation_method")
+  appliedRules       String[] @map("applied_rules")
+  
+  // 免税信息
+  exemptionType      String? @map("exemption_type")
+  exemptionReason    String? @map("exemption_reason")
+  
+  // 元数据
+  metadata           Json?
+  
+  // 时间戳
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  orderId            String   @map("order_id")
+  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderItemId        String?  @map("order_item_id")
+  orderItem          OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@map("tax_calculations")
+  @@index([orderId])
+  @@index([orderItemId])
+  @@index([taxType])
+  @@index([destinationCountry])
+}
+
+// 物流计算模型
+model ShippingCalculation {
+  id                 String  @id @default(cuid())
+  provider           String
+  service            String
+  
+  // 计算信息
+  originCountry      String  @map("origin_country")
+  destinationCountry String  @map("destination_country")
+  weight             Decimal @db.Decimal(8, 3)
+  dimensions         Json?   // 尺寸信息
+  
+  // 价格信息
+  cost               Decimal @db.Decimal(10, 2)
+  currency           String  @default("USD")
+  
+  // 时效信息
+  estimatedDays      Int     @map("estimated_days")
+  
+  // 服务类型
+  serviceType        String  @map("service_type") // express, standard, economy
+  isDDP              Boolean @default(false) @map("is_ddp")
+  
+  // 跟踪信息
+  trackingNumber     String? @map("tracking_number")
+  trackingUrl        String? @map("tracking_url")
+  
+  // 元数据
+  metadata           Json?
+  
+  // 时间戳
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  orderId            String   @map("order_id")
+  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("shipping_calculations")
+  @@index([orderId])
+  @@index([provider])
+  @@index([destinationCountry])
+  @@index([trackingNumber])
+}
+
+// 合规报告模型
+model ComplianceReport {
+  id           String   @id @default(cuid())
+  reportType   String   @map("report_type") // ioss, uk_vat, section_321, eu_vat
+  period       String   // YYYY-MM 格式
+  status       String   @default("draft") // draft, pending, submitted, approved, rejected
+  
+  // 报告数据
+  totalOrders  Int      @map("total_orders")
+  totalValue   Decimal  @map("total_value") @db.Decimal(12, 2)
+  totalTax     Decimal  @map("total_tax") @db.Decimal(10, 2)
+  currency     String   @default("EUR")
+  
+  // 提交信息
+  submittedAt  DateTime? @map("submitted_at")
+  submittedBy  String?   @map("submitted_by")
+  approvedAt   DateTime? @map("approved_at")
+  
+  // 文件信息
+  reportFile   String?   @map("report_file")
+  responseFile String?   @map("response_file")
+  
+  // 元数据
+  metadata     Json?
+  
+  // 时间戳
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  shopId       String   @map("shop_id")
+  shop         Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  orderReports ComplianceOrderReport[]
+
+  @@map("compliance_reports")
+  @@unique([shopId, reportType, period])
+  @@index([shopId])
+  @@index([reportType])
+  @@index([period])
+  @@index([status])
+}
+
+// 合规订单报告关联模型
+model ComplianceOrderReport {
+  id            String  @id @default(cuid())
+  isIncluded    Boolean @default(true) @map("is_included")
+  excludeReason String? @map("exclude_reason")
+  
+  // 时间戳
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  reportId      String  @map("report_id")
+  report        ComplianceReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  orderId       String  @map("order_id")
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("compliance_order_reports")
+  @@unique([reportId, orderId])
+  @@index([reportId])
+  @@index([orderId])
+}
+
+// 审计日志模型
+model AuditLog {
+  id           String  @id @default(cuid())
+  action       String  // CREATE, UPDATE, DELETE, LOGIN, LOGOUT等
+  resource     String  // 资源类型
+  resourceId   String  @map("resource_id")
+  
+  // 请求信息
+  ipAddress    String? @map("ip_address")
+  userAgent    String? @map("user_agent")
+  
+  // 变更信息
+  oldValues    Json?   @map("old_values")
+  newValues    Json?   @map("new_values")
+  
+  // 状态
+  status       String  @default("success") // success, failure, error
+  errorMessage String? @map("error_message")
+  
+  // 元数据
+  metadata     Json?
+  
+  // 时间戳
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  // 关联关系
+  userId       String? @map("user_id")
+  user         User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  shopId       String  @map("shop_id")
+  shop         Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+  @@index([userId])
+  @@index([shopId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+}
+
+// 系统配置模型
+model SystemConfig {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  value       Json
+  category    String
+  description String?
+  isPublic    Boolean @default(false) @map("is_public")
+  updatedBy   String? @map("updated_by")
+  
+  // 时间戳
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("system_configs")
+  @@index([category])
+  @@index([key])
+}
+
+// 税率配置模型
+model TaxRate {
+  id               String   @id @default(cuid())
+  country          String
+  province         String?
+  taxType          String   @map("tax_type") // vat, duty, excise, gst, pst, hst
+  rate             Decimal  @db.Decimal(5, 4)
+  
+  // 适用条件
+  minAmount        Decimal? @map("min_amount") @db.Decimal(10, 2)
+  maxAmount        Decimal? @map("max_amount") @db.Decimal(10, 2)
+  productCategories String[] @map("product_categories")
+  hsCodePatterns   String[] @map("hs_code_patterns")
+  
+  // 有效期
+  effectiveFrom    DateTime @map("effective_from")
+  effectiveTo      DateTime? @map("effective_to")
+  
+  // 状态
+  isActive         Boolean  @default(true) @map("is_active")
+  
+  // 元数据
+  source           String   // 数据来源
+  lastUpdated      DateTime @default(now()) @map("last_updated")
+  
+  // 时间戳
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("tax_rates")
+  @@index([country])
+  @@index([taxType])
+  @@index([isActive])
+  @@index([effectiveFrom])
+  @@index([effectiveTo])
+}
+
+// 物流费率模型
+model ShippingRate {
+  id               String   @id @default(cuid())
+  provider         String
+  service          String
+  
+  // 路线信息
+  originCountry    String   @map("origin_country")
+  destinationCountry String @map("destination_country")
+  
+  // 重量范围
+  minWeight        Decimal  @map("min_weight") @db.Decimal(8, 3)
+  maxWeight        Decimal  @map("max_weight") @db.Decimal(8, 3)
+  weightUnit       String   @map("weight_unit")
+  
+  // 价格信息
+  baseCost         Decimal  @map("base_cost") @db.Decimal(10, 2)
+  additionalCost   Decimal  @map("additional_cost") @db.Decimal(10, 2)
+  currency         String   @default("USD")
+  
+  // 时效信息
+  estimatedDays    Int      @map("estimated_days")
+  
+  // 服务特性
+  isDDP            Boolean  @default(false) @map("is_ddp")
+  serviceType      String   @map("service_type") // express, standard, economy
+  
+  // 有效期
+  effectiveFrom    DateTime @map("effective_from")
+  effectiveTo      DateTime? @map("effective_to")
+  
+  // 状态
+  isActive         Boolean  @default(true) @map("is_active")
+  
+  // 时间戳
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("shipping_rates")
+  @@index([provider])
+  @@index([originCountry])
+  @@index([destinationCountry])
+  @@index([isActive])
+  @@index([effectiveFrom])
+  @@index([effectiveTo])
+}
