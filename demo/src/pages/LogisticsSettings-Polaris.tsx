@@ -1,16 +1,5 @@
 import React, { useState } from 'react'
-import { 
-  Page, 
-  Layout, 
-  Banner,
-  FormLayout,
-  Switch,
-  ButtonGroup,
-  Popover,
-  ActionList
-} from '@shopify/polaris'
 import { useNavigate } from 'react-router-dom'
-import { DeliveryIcon, SettingsIcon, ExternalIcon } from '@shopify/polaris-icons'
 
 export function LogisticsSettings() {
   const navigate = useNavigate()
@@ -25,7 +14,6 @@ export function LogisticsSettings() {
     enableTracking: true,
     notifyCustomer: true
   })
-  const [popoverActive, setPopoverActive] = useState(false)
 
   // 物流服务商数据
   const carriersData = [
@@ -82,348 +70,255 @@ export function LogisticsSettings() {
 
   const getStatusBadge = (status: string) => {
     if (status === 'active') {
-      return <div className="polaris-badge polaris-badge--success">已启用</div>
+      return <span className="badge badge-success">已启用</span>
     }
-    return <div className="polaris-badge polaris-badge--default">未启用</div>
+    return <span className="badge badge-default">未启用</span>
   }
 
   return (
-    <div style={{ backgroundColor: 'var(--p-color-bg-subdued)', minHeight: '100vh' }}>
-      <Page
-        title="物流设置"
-        subtitle="管理物流服务商和配送选项"
-        backAction={{
-          content: '返回仪表板',
-          onAction: () => navigate('/dashboard')
-        }}
-        primaryAction={{
-          content: '保存设置',
-          onAction: handleSave
-        }}
-        secondaryActions={[
-          {
-            content: '测试连接',
-            icon: ExternalIcon,
-            onAction: () => alert('测试所有物流商API连接...')
-          }
-        ]}
-      >
-        {showSuccess && (
-          <div style={{ marginBottom: 'var(--p-space-4)' }}>
-            <Banner
-              title="设置已保存"
-              status="success"
-              onDismiss={() => setShowSuccess(false)}
-            >
-              <p>物流设置已成功更新，新配置将立即生效。</p>
-            </Banner>
+    <div className="fade-in">
+      {showSuccess && (
+        <div className="banner banner-success mb-lg">
+          <div>
+            <strong>✅ 设置已保存</strong><br />
+            物流设置已成功更新，新配置将在下次计算时生效。
           </div>
-        )}
+        </div>
+      )}
 
-        <Layout>
-          <Layout.Section>
-            {/* 物流服务商管理 */}
-            <div className="polaris-card" style={{ marginBottom: 'var(--p-space-4)' }}>
-              <div className="polaris-card__section">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--p-space-3)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <DeliveryIcon />
-                    <h2 className="polaris-text polaris-text--heading-lg" style={{ marginLeft: 'var(--p-space-1)' }}>
-                      物流服务商
-                    </h2>
-                  </div>
-                  <div style={{ display: 'flex', gap: 'var(--p-space-2)' }}>
-                    <Popover
-                      active={popoverActive}
-                      activator={
-                        <button 
-                          className="polaris-button polaris-button--default"
-                          onClick={() => setPopoverActive(!popoverActive)}
-                        >
-                          批量操作
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-lg)' }}>
+        {/* 主要内容区域 */}
+        <div>
+          {/* 物流服务商管理 */}
+          <div className="card mb-lg">
+            <div className="card-header">
+              <h2 className="card-title">🚚 物流服务商管理</h2>
+              <p className="card-subtitle">配置和管理您的物流合作伙伴</p>
+            </div>
+            <div className="card-content">
+              <div className="grid grid-1 gap-md">
+                {carriersData.map((carrier, index) => (
+                  <div key={index} className="card" style={{ padding: 'var(--space-lg)' }}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-md">
+                        <div style={{ fontSize: '32px' }}>{carrier.logo}</div>
+                        <div>
+                          <h3 className="font-semibold mb-xs">{carrier.name}</h3>
+                          <div className="flex items-center gap-md text-secondary">
+                            <span>📍 {carrier.countries} 个国家</span>
+                            <span>⏱️ {carrier.avgTime}</span>
+                            <span>DDP: {carrier.ddpSupport ? '✅' : '❌'}</span>
+                          </div>
+                          <p className="text-secondary mt-xs">最后更新: {carrier.lastUpdate}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-md">
+                        {getStatusBadge(carrier.status)}
+                        <button className="btn btn-secondary btn-sm">
+                          配置
                         </button>
-                      }
-                      onClose={() => setPopoverActive(false)}
-                    >
-                      <ActionList
-                        items={[
-                          { content: '全部启用', onAction: () => alert('全部启用') },
-                          { content: '全部禁用', onAction: () => alert('全部禁用') },
-                          { content: '刷新状态', onAction: () => alert('刷新状态') }
-                        ]}
-                      />
-                    </Popover>
-                    <button className="polaris-button polaris-button--primary">
-                      添加服务商
-                    </button>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--p-space-3)' }}>
-                  {carriersData.map((carrier, index) => (
-                    <div key={index} className="polaris-card" style={{ border: '1px solid var(--p-color-border-subdued)' }}>
-                      <div className="polaris-card__section">
-                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 'var(--p-space-2)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <span style={{ fontSize: '1.5rem', marginRight: 'var(--p-space-1)' }}>{carrier.logo}</span>
-                            <div>
-                              <h3 className="polaris-text polaris-text--body-md" style={{ fontWeight: '600' }}>
-                                {carrier.name}
-                              </h3>
-                              <p className="polaris-text polaris-text--body-sm polaris-text--subdued">
-                                {carrier.code}
-                              </p>
-                            </div>
-                          </div>
-                          {getStatusBadge(carrier.status)}
-                        </div>
-
-                        <div style={{ marginBottom: 'var(--p-space-2)' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--p-space-05)' }}>
-                            <span className="polaris-text polaris-text--body-sm polaris-text--subdued">配送时效</span>
-                            <span className="polaris-text polaris-text--body-sm">{carrier.avgTime}</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--p-space-05)' }}>
-                            <span className="polaris-text polaris-text--body-sm polaris-text--subdued">覆盖国家</span>
-                            <span className="polaris-text polaris-text--body-sm">{carrier.countries}个</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--p-space-05)' }}>
-                            <span className="polaris-text polaris-text--body-sm polaris-text--subdued">DDP支持</span>
-                            <span className="polaris-text polaris-text--body-sm">
-                              {carrier.ddpSupport ? '✅ 支持' : '❌ 不支持'}
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span className="polaris-text polaris-text--body-sm polaris-text--subdued">最后更新</span>
-                            <span className="polaris-text polaris-text--body-sm">{carrier.lastUpdate}</span>
-                          </div>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: 'var(--p-space-1)' }}>
-                          <button 
-                            className={`polaris-button ${carrier.status === 'active' ? 'polaris-button--critical' : 'polaris-button--primary'}`}
-                            style={{ flex: 1 }}
-                          >
-                            {carrier.status === 'active' ? '禁用' : '启用'}
-                          </button>
-                          <button className="polaris-button polaris-button--default">
-                            配置
-                          </button>
-                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
+          </div>
 
-            {/* 配送策略设置 */}
-            <div className="polaris-card" style={{ marginBottom: 'var(--p-space-4)' }}>
-              <div className="polaris-card__section">
-                <h2 className="polaris-text polaris-text--heading-lg" style={{ marginBottom: 'var(--p-space-3)' }}>
-                  配送策略
-                </h2>
-                
-                <FormLayout>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--p-space-3)' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--p-space-2)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                        <div>
-                          <h4 className="polaris-text polaris-text--body-md">优先选择DDP</h4>
-                          <p className="polaris-text polaris-text--body-sm polaris-text--subdued">
-                            优先推荐含税到门服务
-                          </p>
-                        </div>
-                        <Switch
-                          checked={settings.prioritizeDDP}
-                          onChange={handleToggle('prioritizeDDP')}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--p-space-2)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                        <div>
-                          <h4 className="polaris-text polaris-text--body-md">自动选择最便宜</h4>
-                          <p className="polaris-text polaris-text--body-sm polaris-text--subdued">
-                            自动选择费用最低的方案
-                          </p>
-                        </div>
-                        <Switch
-                          checked={settings.autoSelectCheapest}
-                          onChange={handleToggle('autoSelectCheapest')}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--p-space-2)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                        <div>
-                          <h4 className="polaris-text polaris-text--body-md">启用物流跟踪</h4>
-                          <p className="polaris-text polaris-text--body-sm polaris-text--subdued">
-                            提供实时物流跟踪信息
-                          </p>
-                        </div>
-                        <Switch
-                          checked={settings.enableTracking}
-                          onChange={handleToggle('enableTracking')}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--p-space-2)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                        <div>
-                          <h4 className="polaris-text polaris-text--body-md">通知客户</h4>
-                          <p className="polaris-text polaris-text--body-sm polaris-text--subdued">
-                            自动发送物流状态更新
-                          </p>
-                        </div>
-                        <Switch
-                          checked={settings.notifyCustomer}
-                          onChange={handleToggle('notifyCustomer')}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </FormLayout>
-              </div>
+          {/* 配送选项设置 */}
+          <div className="card mb-lg">
+            <div className="card-header">
+              <h2 className="card-title">⚙️ 配送选项设置</h2>
+              <p className="card-subtitle">配置自动选择和优化策略</p>
             </div>
-
-            {/* 费率对比 */}
-            <div className="polaris-card">
-              <div className="polaris-card__section">
-                <h2 className="polaris-text polaris-text--heading-lg" style={{ marginBottom: 'var(--p-space-3)' }}>
-                  实时费率对比 (示例：中国 → 英国，1kg)
-                </h2>
-                
-                <table className="polaris-data-table">
-                  <thead className="polaris-data-table__header">
-                    <tr>
-                      <th className="polaris-data-table__cell">服务商</th>
-                      <th className="polaris-data-table__cell">服务类型</th>
-                      <th className="polaris-data-table__cell">预计时效</th>
-                      <th className="polaris-data-table__cell">费用 (USD)</th>
-                      <th className="polaris-data-table__cell">DDP</th>
-                      <th className="polaris-data-table__cell">推荐度</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="polaris-data-table__row">
-                      <td className="polaris-data-table__cell">
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={{ marginRight: 'var(--p-space-1)' }}>🚚</span>
-                          DHL eCommerce
-                        </div>
-                      </td>
-                      <td className="polaris-data-table__cell">Packet Plus</td>
-                      <td className="polaris-data-table__cell">5-7 工作日</td>
-                      <td className="polaris-data-table__cell">$12.50</td>
-                      <td className="polaris-data-table__cell">
-                        <div className="polaris-badge polaris-badge--success">支持</div>
-                      </td>
-                      <td className="polaris-data-table__cell">⭐⭐⭐⭐⭐</td>
-                    </tr>
-                    <tr className="polaris-data-table__row">
-                      <td className="polaris-data-table__cell">
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={{ marginRight: 'var(--p-space-1)' }}>✈️</span>
-                          YunExpress
-                        </div>
-                      </td>
-                      <td className="polaris-data-table__cell">Standard</td>
-                      <td className="polaris-data-table__cell">7-12 工作日</td>
-                      <td className="polaris-data-table__cell">$8.90</td>
-                      <td className="polaris-data-table__cell">
-                        <div className="polaris-badge polaris-badge--success">支持</div>
-                      </td>
-                      <td className="polaris-data-table__cell">⭐⭐⭐⭐</td>
-                    </tr>
-                    <tr className="polaris-data-table__row">
-                      <td className="polaris-data-table__cell">
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <span style={{ marginRight: 'var(--p-space-1)' }}>📦</span>
-                          SF Express
-                        </div>
-                      </td>
-                      <td className="polaris-data-table__cell">International</td>
-                      <td className="polaris-data-table__cell">3-5 工作日</td>
-                      <td className="polaris-data-table__cell">$18.00</td>
-                      <td className="polaris-data-table__cell">
-                        <div className="polaris-badge polaris-badge--critical">不支持</div>
-                      </td>
-                      <td className="polaris-data-table__cell">⭐⭐⭐</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </Layout.Section>
-
-          <Layout.Section variant="oneThird">
-            {/* 物流统计 */}
-            <div className="polaris-card">
-              <div className="polaris-card__section">
-                <h3 className="polaris-text polaris-text--heading-md" style={{ marginBottom: 'var(--p-space-2)' }}>
-                  物流统计
-                </h3>
-                
-                <div style={{ marginBottom: 'var(--p-space-2)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className="polaris-text polaris-text--body-sm">活跃服务商</span>
-                    <span className="polaris-text polaris-text--body-sm" style={{ fontWeight: '600' }}>2</span>
-                  </div>
-                </div>
-                
-                <div style={{ marginBottom: 'var(--p-space-2)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className="polaris-text polaris-text--body-sm">本月发货</span>
-                    <span className="polaris-text polaris-text--body-sm" style={{ fontWeight: '600' }}>1,234</span>
-                  </div>
-                </div>
-                
-                <div style={{ marginBottom: 'var(--p-space-2)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className="polaris-text polaris-text--body-sm">时效达成率</span>
-                    <div className="polaris-badge polaris-badge--success">98.1%</div>
-                  </div>
-                </div>
-                
+            <div className="card-content">
+              <div className="grid grid-2 gap-lg">
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className="polaris-text polaris-text--body-sm">平均费用</span>
-                    <span className="polaris-text polaris-text--body-sm" style={{ fontWeight: '600' }}>$11.20</span>
+                  <h4 className="font-medium mb-md">物流选择策略</h4>
+                  <div className="form-group">
+                    <div className="checkbox-wrapper mb-md">
+                      <input
+                        type="checkbox"
+                        id="prioritizeDDP"
+                        className="checkbox"
+                        checked={settings.prioritizeDDP}
+                        onChange={(e) => handleToggle('prioritizeDDP')(e.target.checked)}
+                      />
+                      <label htmlFor="prioritizeDDP">
+                        优先推荐DDP（含税到门）
+                      </label>
+                    </div>
+                    
+                    <div className="checkbox-wrapper mb-md">
+                      <input
+                        type="checkbox"
+                        id="autoSelectCheapest"
+                        className="checkbox"
+                        checked={settings.autoSelectCheapest}
+                        onChange={(e) => handleToggle('autoSelectCheapest')(e.target.checked)}
+                      />
+                      <label htmlFor="autoSelectCheapest">
+                        自动选择最便宜的方案
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-md">客户通知</h4>
+                  <div className="form-group">
+                    <div className="checkbox-wrapper mb-md">
+                      <input
+                        type="checkbox"
+                        id="enableTracking"
+                        className="checkbox"
+                        checked={settings.enableTracking}
+                        onChange={(e) => handleToggle('enableTracking')(e.target.checked)}
+                      />
+                      <label htmlFor="enableTracking">
+                        启用包裹跟踪
+                      </label>
+                    </div>
+                    
+                    <div className="checkbox-wrapper mb-md">
+                      <input
+                        type="checkbox"
+                        id="notifyCustomer"
+                        className="checkbox"
+                        checked={settings.notifyCustomer}
+                        onChange={(e) => handleToggle('notifyCustomer')(e.target.checked)}
+                      />
+                      <label htmlFor="notifyCustomer">
+                        自动通知客户物流状态
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* 快速操作 */}
-            <div className="polaris-card" style={{ marginTop: 'var(--p-space-4)' }}>
-              <div className="polaris-card__section">
-                <h3 className="polaris-text polaris-text--heading-md" style={{ marginBottom: 'var(--p-space-3)' }}>
-                  快速操作
-                </h3>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--p-space-2)' }}>
-                  <button className="polaris-button polaris-button--default" style={{ width: '100%' }}>
-                    测试所有连接
-                  </button>
-                  <button className="polaris-button polaris-button--default" style={{ width: '100%' }}>
-                    刷新费率
-                  </button>
-                  <button className="polaris-button polaris-button--default" style={{ width: '100%' }}>
-                    导出配置
-                  </button>
-                  <button className="polaris-button polaris-button--default" style={{ width: '100%' }}>
-                    查看文档
-                  </button>
-                </div>
+          {/* 费用对比表 */}
+          <div className="card">
+            <div className="card-header">
+              <h2 className="card-title">💰 费用对比表</h2>
+              <p className="card-subtitle">不同重量段的运费对比（示例数据）</p>
+            </div>
+            <div className="card-content">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>重量范围</th>
+                    <th>DHL eCommerce</th>
+                    <th>YunExpress</th>
+                    <th>SF Express</th>
+                    <th>推荐</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span className="font-medium">0-500g</span></td>
+                    <td>$8.50</td>
+                    <td>$6.80</td>
+                    <td>$12.00</td>
+                    <td><span className="badge badge-success">YunExpress</span></td>
+                  </tr>
+                  <tr>
+                    <td><span className="font-medium">500g-1kg</span></td>
+                    <td>$12.50</td>
+                    <td>$11.20</td>
+                    <td>$16.50</td>
+                    <td><span className="badge badge-success">YunExpress</span></td>
+                  </tr>
+                  <tr>
+                    <td><span className="font-medium">1-2kg</span></td>
+                    <td>$18.00</td>
+                    <td>$19.50</td>
+                    <td>$24.00</td>
+                    <td><span className="badge badge-success">DHL</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* 侧边栏 */}
+        <div>
+          {/* 物流统计 */}
+          <div className="card mb-lg">
+            <div className="card-header">
+              <h3 className="card-title">📊 物流统计</h3>
+            </div>
+            <div className="card-content">
+              <div className="flex justify-between items-center mb-md">
+                <span className="text-secondary">活跃服务商</span>
+                <span className="font-semibold">2</span>
+              </div>
+              
+              <div className="flex justify-between items-center mb-md">
+                <span className="text-secondary">本月发货量</span>
+                <span className="font-semibold">1,245</span>
+              </div>
+              
+              <div className="flex justify-between items-center mb-md">
+                <span className="text-secondary">平均时效</span>
+                <span className="font-semibold">6.2天</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-secondary">DDP比例</span>
+                <span className="badge badge-success">87%</span>
               </div>
             </div>
-          </Layout.Section>
-        </Layout>
-      </Page>
+          </div>
+
+          {/* 配置帮助 */}
+          <div className="card mb-lg">
+            <div className="card-header">
+              <h3 className="card-title">💡 配置提示</h3>
+            </div>
+            <div className="card-content">
+              <p className="text-secondary mb-md">
+                合理配置物流选项可以提升客户满意度。
+              </p>
+              
+              <div className="mb-lg">
+                <h4 className="font-medium mb-sm">建议:</h4>
+                <ul style={{ paddingLeft: 'var(--space-lg)', margin: 0 }}>
+                  <li className="text-secondary mb-xs">启用多个物流服务商备选</li>
+                  <li className="text-secondary mb-xs">优先使用DDP模式</li>
+                  <li className="text-secondary mb-xs">定期检查费用变化</li>
+                </ul>
+              </div>
+              
+              <button className="btn btn-secondary w-full">
+                📚 查看文档
+              </button>
+            </div>
+          </div>
+
+          {/* 快速操作 */}
+          <div className="card">
+            <div className="card-header">
+              <h3 className="card-title">⚡ 快速操作</h3>
+            </div>
+            <div className="card-content">
+              <div className="flex flex-col gap-sm">
+                <button className="btn btn-secondary btn-sm">
+                  🔄 刷新费率
+                </button>
+                <button className="btn btn-secondary btn-sm">
+                  📊 查看报表
+                </button>
+                <button className="btn btn-secondary btn-sm">
+                  ⚙️ 高级设置
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

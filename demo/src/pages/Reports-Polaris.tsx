@@ -1,29 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { 
-  Page, 
-  Layout, 
-  Card, 
-  Button, 
-  Select, 
-  Tabs, 
-  DataTable,
-  Text,
-  Stack,
-  ProgressBar,
-  Banner,
-  ButtonGroup,
-  Popover,
-  ActionList
-} from '@shopify/polaris'
 import { useNavigate } from 'react-router-dom'
-import { ExportIcon, CalendarIcon, TrendingUpIcon } from '@shopify/polaris-icons'
 
 export function Reports() {
   const navigate = useNavigate()
   const [selectedPeriod, setSelectedPeriod] = useState('month')
   const [selectedTab, setSelectedTab] = useState(0)
   const [loading, setLoading] = useState(false)
-  const [exportPopoverActive, setExportPopoverActive] = useState(false)
 
   const generateReport = (type: string) => {
     setLoading(true)
@@ -41,302 +23,301 @@ export function Reports() {
   ]
 
   const tabs = [
-    { id: 'overview', content: '📊 总览' },
-    { id: 'sales', content: '💰 销售分析' },
-    { id: 'tax', content: '🧾 税费分析' },
-    { id: 'logistics', content: '🚚 物流分析' },
-    { id: 'compliance', content: '✅ 合规分析' },
-  ]
-
-  // KPI 数据
-  const kpiData = [
-    { title: '总收入', value: '$89,247', change: '+12.5%', trend: 'positive' },
-    { title: '税费收入', value: '$8,924', change: '+15.2%', trend: 'positive' },
-    { title: '订单数量', value: '1,247', change: '+8.7%', trend: 'positive' },
-    { title: '平均订单价值', value: '$71.58', change: '+3.4%', trend: 'positive' },
-  ]
-
-  // 地区分布数据
-  const regionData = [
-    { region: '🇺🇸 美国', percentage: 35, orders: 436, revenue: 31245 },
-    { region: '🇪🇺 欧盟', percentage: 28, orders: 349, revenue: 24987 },
-    { region: '🇬🇧 英国', percentage: 18, orders: 224, revenue: 16058 },
-    { region: '🌏 其他', percentage: 19, orders: 238, revenue: 17057 }
-  ]
-
-  // 详细数据表格
-  const tableRows = [
-    ['2024-01-20', '45', '$3,240', '$324', '$72', '98.9%'],
-    ['2024-01-19', '52', '$3,744', '$374', '$72', '96.2%'],
-    ['2024-01-18', '38', '$2,736', '$274', '$72', '100%'],
-    ['2024-01-17', '41', '$2,952', '$295', '$72', '97.6%'],
-    ['2024-01-16', '47', '$3,384', '$338', '$72', '95.7%'],
-    ['2024-01-15', '39', '$2,808', '$281', '$72', '100%'],
-    ['2024-01-14', '44', '$3,168', '$317', '$72', '97.7%'],
-  ]
-
-  const exportActions = [
-    { content: '导出 CSV', onAction: () => generateReport('CSV') },
-    { content: '导出 PDF', onAction: () => generateReport('PDF') },
-    { content: '导出 Excel', onAction: () => generateReport('Excel') },
-    { content: '发送邮件报告', onAction: () => alert('邮件发送功能开发中...') },
+    { id: 'overview', name: '📊 总览' },
+    { id: 'sales', name: '💰 销售分析' },
+    { id: 'tax', name: '🧾 税费分析' },
+    { id: 'logistics', name: '🚚 物流分析' },
+    { id: 'compliance', name: '✅ 合规分析' },
   ]
 
   const renderOverviewTab = () => (
-    <Layout>
-      <Layout.Section>
-        {/* KPI 指标卡片 */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--p-space-4)', marginBottom: 'var(--p-space-6)' }}>
-          {kpiData.map((kpi, index) => (
-            <div key={index} className="polaris-card">
-              <div className="polaris-card__section">
-                <Stack distribution="equalSpacing" alignment="center">
-                  <div>
-                    <Text variant="bodySm" color="subdued" as="p">
-                      {kpi.title}
-                    </Text>
-                    <Text variant="heading2xl" as="h3">
-                      {kpi.value}
-                    </Text>
-                  </div>
-                  <div className="polaris-badge polaris-badge--success">
-                    {kpi.change}
-                  </div>
-                </Stack>
-              </div>
-            </div>
-          ))}
+    <div>
+      {/* 概览 KPI */}
+      <div className="grid grid-4 mb-lg">
+        <div className="card kpi-card">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: 'var(--space-sm)' }}>📈</div>
+            <h3 className="kpi-title">总销售额</h3>
+            <div className="kpi-value">$127,450</div>
+            <div className="kpi-change positive">▲ 18.2% vs 上月</div>
+          </div>
         </div>
 
-        {/* 图表和地区分布 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--p-space-6)', marginBottom: 'var(--p-space-6)' }}>
-          {/* 趋势图表 */}
-          <Card>
-            <div style={{ padding: 'var(--p-space-4)' }}>
-              <Stack distribution="equalSpacing" alignment="center">
-                <Text variant="headingLg" as="h3">
-                  📈 订单趋势分析
-                </Text>
-                <Button
-                  icon={TrendingUpIcon}
-                  variant="plain"
-                  onClick={() => alert('图表设置功能开发中...')}
-                >
-                  设置
-                </Button>
-              </Stack>
-              
-              <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)', marginTop: 'var(--p-space-4)' }}>
-                <div style={{ textAlign: 'center' }}>
-                  <Text variant="bodyLg" color="subdued" as="p">
-                    📊 趋势图表
-                  </Text>
-                  <Text variant="bodySm" color="subdued" as="p" style={{ marginTop: 'var(--p-space-2)' }}>
-                    订单量持续增长，税费收入稳步提升
-                  </Text>
-                  
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--p-space-4)', marginTop: 'var(--p-space-4)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--p-space-1)' }}>
-                      <div style={{ width: '12px', height: '12px', backgroundColor: 'var(--p-color-bg-primary)', borderRadius: '50%' }}></div>
-                      <Text variant="bodySm" as="span">订单数量</Text>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--p-space-1)' }}>
-                      <div style={{ width: '12px', height: '12px', backgroundColor: 'var(--p-color-bg-info)', borderRadius: '50%' }}></div>
-                      <Text variant="bodySm" as="span">税费收入</Text>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* 地区分布 */}
-          <Card>
-            <div style={{ padding: 'var(--p-space-4)' }}>
-              <Text variant="headingLg" as="h3" style={{ marginBottom: 'var(--p-space-4)' }}>
-                🌍 地区分布
-              </Text>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--p-space-4)' }}>
-                {regionData.map((item, index) => (
-                  <div key={index}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--p-space-1)' }}>
-                      <Text variant="bodyMd" fontWeight="medium" as="span">
-                        {item.region}
-                      </Text>
-                      <Text variant="bodyMd" color="subdued" as="span">
-                        {item.percentage}%
-                      </Text>
-                    </div>
-                    <ProgressBar progress={item.percentage} size="small" />
-                    <Text variant="bodySm" color="subdued" as="p" style={{ marginTop: 'var(--p-space-05)' }}>
-                      {item.orders} 订单 | ${item.revenue.toLocaleString()}
-                    </Text>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
+        <div className="card kpi-card">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: 'var(--space-sm)' }}>🧾</div>
+            <h3 className="kpi-title">税费总额</h3>
+            <div className="kpi-value">$12,745</div>
+            <div className="kpi-change positive">▲ 15.3% vs 上月</div>
+          </div>
         </div>
 
-        {/* 详细数据表格 */}
-        <Card>
-          <div style={{ padding: 'var(--p-space-4)' }}>
-            <Stack distribution="equalSpacing" alignment="center">
-              <Text variant="headingLg" as="h3">
-                📋 详细数据
-              </Text>
-              <div style={{ display: 'flex', gap: 'var(--p-space-2)' }}>
-                <Button variant="primary" size="slim" onClick={() => generateReport('CSV')}>
-                  导出 CSV
-                </Button>
-                <Button variant="primary" size="slim" onClick={() => generateReport('PDF')}>
-                  导出 PDF
-                </Button>
+        <div className="card kpi-card">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: 'var(--space-sm)' }}>🚚</div>
+            <h3 className="kpi-title">物流成本</h3>
+            <div className="kpi-value">$8,230</div>
+            <div className="kpi-change negative">▼ 2.1% vs 上月</div>
+          </div>
+        </div>
+
+        <div className="card kpi-card">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: 'var(--space-sm)' }}>📦</div>
+            <h3 className="kpi-title">订单数量</h3>
+            <div className="kpi-value">1,847</div>
+            <div className="kpi-change positive">▲ 22.8% vs 上月</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 图表展示区域 */}
+      <div className="grid grid-2 gap-lg mb-lg">
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">📈 销售趋势</h3>
+          </div>
+          <div className="card-content">
+            <div style={{ 
+              height: '300px',
+              backgroundColor: 'var(--form-bg-info)',
+              borderRadius: 'var(--border-radius)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              border: '2px dashed var(--border-color)'
+            }}>
+              <div>
+                <div style={{ fontSize: '3rem', marginBottom: 'var(--space-md)' }}>📊</div>
+                <h4 className="font-semibold mb-sm">销售趋势图表</h4>
+                <p className="text-secondary">Chart.js 图表组件</p>
               </div>
-            </Stack>
-            
-            <div style={{ marginTop: 'var(--p-space-4)' }}>
-              <DataTable
-                columnContentTypes={['text', 'numeric', 'numeric', 'numeric', 'numeric', 'text']}
-                headings={['日期', '订单数', '总收入', '税费收入', '平均订单价值', '合规率']}
-                rows={tableRows}
-                footerContent={`共显示 ${tableRows.length} 条记录`}
-              />
             </div>
           </div>
-        </Card>
+        </div>
 
-        {/* 数据洞察 */}
-        <div style={{ marginTop: 'var(--p-space-6)' }}>
-          <Card>
-            <div style={{ padding: 'var(--p-space-4)' }}>
-              <Text variant="headingLg" as="h3" style={{ marginBottom: 'var(--p-space-4)' }}>
-                💡 数据洞察和建议
-              </Text>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--p-space-4)' }}>
-                <Banner status="info">
-                  <p><strong>📈 增长趋势</strong></p>
-                  <p>订单量环比增长12.5%，建议增加营销投入以维持增长势头</p>
-                </Banner>
-                
-                <Banner status="warning">
-                  <p><strong>⚠️ 注意事项</strong></p>
-                  <p>欧盟地区合规率略有下降，建议检查IOSS申报流程</p>
-                </Banner>
-                
-                <Banner status="success">
-                  <p><strong>💰 收入优化</strong></p>
-                  <p>美国市场表现优异，可考虑推出针对性的产品线</p>
-                </Banner>
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">🌍 地区分布</h3>
+          </div>
+          <div className="card-content">
+            <div style={{ 
+              height: '300px',
+              backgroundColor: 'var(--form-bg-info)',
+              borderRadius: 'var(--border-radius)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              border: '2px dashed var(--border-color)'
+            }}>
+              <div>
+                <div style={{ fontSize: '3rem', marginBottom: 'var(--space-md)' }}>🗺️</div>
+                <h4 className="font-semibold mb-sm">地区分布图</h4>
+                <p className="text-secondary">世界地图可视化</p>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
-      </Layout.Section>
-    </Layout>
+      </div>
+
+      {/* 快速数据表格 */}
+      <div className="card">
+        <div className="card-header">
+          <h3 className="card-title">📋 快速数据概览</h3>
+        </div>
+        <div className="card-content">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>指标</th>
+                <th>当前值</th>
+                <th>上月对比</th>
+                <th>趋势</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>🇺🇸 美国订单</td>
+                <td className="font-medium">647</td>
+                <td>+127 (+24.4%)</td>
+                <td><span className="badge badge-success">上升</span></td>
+              </tr>
+              <tr>
+                <td>🇪🇺 欧盟订单</td>
+                <td className="font-medium">892</td>
+                <td>+156 (+21.2%)</td>
+                <td><span className="badge badge-success">上升</span></td>
+              </tr>
+              <tr>
+                <td>🇬🇧 英国订单</td>
+                <td className="font-medium">308</td>
+                <td>+45 (+17.1%)</td>
+                <td><span className="badge badge-success">上升</span></td>
+              </tr>
+              <tr>
+                <td>DDP 比例</td>
+                <td className="font-medium">87.3%</td>
+                <td>+2.1%</td>
+                <td><span className="badge badge-success">上升</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   )
 
-  const renderPlaceholderTab = (tabName: string) => (
-    <Layout>
-      <Layout.Section>
-        <Card>
-          <div style={{ padding: 'var(--p-space-8)', textAlign: 'center' }}>
-            <Text variant="headingMd" as="h3" style={{ marginBottom: 'var(--p-space-2)' }}>
-              {tabName} 功能开发中
-            </Text>
-            <Text variant="bodyMd" color="subdued" as="p">
-              该模块正在开发中，敬请期待更详细的分析功能
-            </Text>
+  const renderSalesTab = () => (
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">💰 销售分析报表</h2>
+      </div>
+      <div className="card-content">
+        <div className="banner banner-info mb-lg">
+          <div>
+            <strong>📈 销售分析功能</strong><br />
+            详细的销售数据分析，包括产品表现、客户分析、地区销售等维度的深度报表。
           </div>
-        </Card>
-      </Layout.Section>
-    </Layout>
+        </div>
+        <div style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>
+          <div style={{ fontSize: '4rem', marginBottom: 'var(--space-lg)' }}>🚧</div>
+          <h3 className="font-semibold mb-sm">功能开发中</h3>
+          <p className="text-secondary">销售分析模块正在开发中，敬请期待！</p>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderTaxTab = () => (
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">🧾 税费分析报表</h2>
+      </div>
+      <div className="card-content">
+        <div className="banner banner-warning mb-lg">
+          <div>
+            <strong>🧾 税费分析功能</strong><br />
+            各国税费明细、IOSS申报数据、UK VAT统计、Section 321优化建议等专业税务分析。
+          </div>
+        </div>
+        <div style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>
+          <div style={{ fontSize: '4rem', marginBottom: 'var(--space-lg)' }}>🚧</div>
+          <h3 className="font-semibold mb-sm">功能开发中</h3>
+          <p className="text-secondary">税费分析模块正在开发中，敬请期待！</p>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderLogisticsTab = () => (
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">🚚 物流分析报表</h2>
+      </div>
+      <div className="card-content">
+        <div className="banner banner-success mb-lg">
+          <div>
+            <strong>🚚 物流分析功能</strong><br />
+            物流成本优化、时效分析、服务商表现对比、配送路线优化等物流数据洞察。
+          </div>
+        </div>
+        <div style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>
+          <div style={{ fontSize: '4rem', marginBottom: 'var(--space-lg)' }}>🚧</div>
+          <h3 className="font-semibold mb-sm">功能开发中</h3>
+          <p className="text-secondary">物流分析模块正在开发中，敬请期待！</p>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderComplianceTab = () => (
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">✅ 合规分析报表</h2>
+      </div>
+      <div className="card-content">
+        <div className="banner banner-error mb-lg">
+          <div>
+            <strong>✅ 合规分析功能</strong><br />
+            合规申报状态监控、风险预警、申报成功率统计、各国政策变化影响分析。
+          </div>
+        </div>
+        <div style={{ textAlign: 'center', padding: 'var(--space-2xl)' }}>
+          <div style={{ fontSize: '4rem', marginBottom: 'var(--space-lg)' }}>🚧</div>
+          <h3 className="font-semibold mb-sm">功能开发中</h3>
+          <p className="text-secondary">合规分析模块正在开发中，敬请期待！</p>
+        </div>
+      </div>
+    </div>
   )
 
   return (
-    <div style={{ backgroundColor: 'var(--p-color-bg-subdued)', minHeight: '100vh' }}>
-      <Page
-        title="数据报表"
-        subtitle="查看业务数据统计和趋势分析"
-        backAction={{
-          content: '返回仪表板',
-          onAction: () => navigate('/dashboard')
-        }}
-        primaryAction={{
-          content: '导出报表',
-          icon: ExportIcon,
-          onAction: () => setExportPopoverActive(true)
-        }}
-        secondaryActions={[
-          {
-            content: '调度报告',
-            icon: CalendarIcon,
-            onAction: () => alert('调度报告功能开发中...')
-          }
-        ]}
-      >
-        {loading && (
-          <div style={{ marginBottom: 'var(--p-space-4)' }}>
-            <Banner title="正在生成报表" status="info">
-              <p>请稍候，报表生成可能需要几秒钟时间...</p>
-            </Banner>
-          </div>
-        )}
-
-        <Layout>
-          <Layout.Section>
-            {/* 期间选择器 */}
-            <div style={{ marginBottom: 'var(--p-space-4)' }}>
-              <Card>
-                <div style={{ padding: 'var(--p-space-4)' }}>
-                  <Stack distribution="equalSpacing" alignment="center">
-                    <div>
-                      <Text variant="bodyMd" as="p">
-                        选择报表期间
-                      </Text>
-                    </div>
-                    <div style={{ minWidth: '200px' }}>
-                      <Select
-                        label=""
-                        labelHidden
-                        options={periodOptions}
-                        value={selectedPeriod}
-                        onChange={setSelectedPeriod}
-                      />
-                    </div>
-                  </Stack>
-                </div>
-              </Card>
+    <div className="fade-in">
+      {/* 报表控制栏 */}
+      <div className="card mb-lg">
+        <div className="card-content">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 'var(--space-md)', alignItems: 'end' }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">报表周期</label>
+              <select
+                className="form-select"
+                value={selectedPeriod}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+              >
+                {periodOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
-
-            {/* 标签页 */}
-            <Card>
-              <Tabs tabs={tabs} selected={selectedTab} onSelect={setSelectedTab}>
-                <div style={{ padding: 'var(--p-space-4)' }}>
-                  {selectedTab === 0 && renderOverviewTab()}
-                  {selectedTab === 1 && renderPlaceholderTab('销售分析')}
-                  {selectedTab === 2 && renderPlaceholderTab('税费分析')}
-                  {selectedTab === 3 && renderPlaceholderTab('物流分析')}
-                  {selectedTab === 4 && renderPlaceholderTab('合规分析')}
-                </div>
-              </Tabs>
-            </Card>
-          </Layout.Section>
-        </Layout>
-
-        {/* 导出 Popover */}
-        <div style={{ position: 'fixed', top: 0, right: 0, zIndex: 9999 }}>
-          <Popover
-            active={exportPopoverActive}
-            activator={<div></div>}
-            onClose={() => setExportPopoverActive(false)}
-          >
-            <ActionList items={exportActions} />
-          </Popover>
+            
+            <button 
+              className="btn btn-secondary"
+              onClick={() => generateReport('综合报表')}
+              disabled={loading}
+            >
+              📊 生成报表
+            </button>
+            
+            <button 
+              className="btn btn-primary"
+              onClick={() => generateReport('导出')}
+              disabled={loading}
+            >
+              {loading ? '生成中...' : '📥 导出数据'}
+            </button>
+          </div>
         </div>
-      </Page>
+      </div>
+
+      {/* Tab 导航 */}
+      <div className="card mb-lg">
+        <div className="card-content" style={{ padding: 'var(--space-md)' }}>
+          <div className="flex gap-md">
+            {tabs.map((tab, index) => (
+              <button
+                key={tab.id}
+                className={`btn ${selectedTab === index ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setSelectedTab(index)}
+              >
+                {tab.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Tab 内容 */}
+      <div>
+        {selectedTab === 0 && renderOverviewTab()}
+        {selectedTab === 1 && renderSalesTab()}
+        {selectedTab === 2 && renderTaxTab()}
+        {selectedTab === 3 && renderLogisticsTab()}
+        {selectedTab === 4 && renderComplianceTab()}
+      </div>
     </div>
   )
 }

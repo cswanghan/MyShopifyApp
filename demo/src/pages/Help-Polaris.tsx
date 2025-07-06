@@ -1,31 +1,5 @@
 import React, { useState } from 'react'
-import { 
-  Page, 
-  Layout, 
-  Card, 
-  Button, 
-  TextField, 
-  Navigation,
-  Text,
-  Stack,
-  Banner,
-  ButtonGroup,
-  Icon
-} from '@shopify/polaris'
 import { useNavigate } from 'react-router-dom'
-import { 
-  SearchIcon, 
-  QuestionCircleIcon, 
-  BookIcon, 
-  SettingsIcon, 
-  DeliveryIcon, 
-  TroubleshootIcon, 
-  ApiIcon, 
-  ChatIcon,
-  PlayIcon,
-  LightbulbIcon,
-  RocketIcon
-} from '@shopify/polaris-icons'
 
 export function Help() {
   const navigate = useNavigate()
@@ -36,7 +10,7 @@ export function Help() {
     {
       id: 'getting-started',
       title: '快速开始',
-      icon: RocketIcon,
+      icon: '🚀',
       content: {
         title: '快速开始使用 DTax-Bridge',
         items: [
@@ -66,7 +40,7 @@ export function Help() {
     {
       id: 'tax-compliance',
       title: '税务合规',
-      icon: BookIcon,
+      icon: '📋',
       content: {
         title: '税务合规指南',
         items: [
@@ -96,7 +70,7 @@ export function Help() {
     {
       id: 'logistics',
       title: '物流管理',
-      icon: DeliveryIcon,
+      icon: '🚚',
       content: {
         title: '物流方案配置',
         items: [
@@ -126,7 +100,7 @@ export function Help() {
     {
       id: 'troubleshooting',
       title: '故障排除',
-      icon: TroubleshootIcon,
+      icon: '🔧',
       content: {
         title: '常见问题解决',
         items: [
@@ -156,7 +130,7 @@ export function Help() {
     {
       id: 'api-docs',
       title: 'API 文档',
-      icon: ApiIcon,
+      icon: '⚡',
       content: {
         title: 'API 集成指南',
         items: [
@@ -186,7 +160,7 @@ export function Help() {
     {
       id: 'contact',
       title: '联系支持',
-      icon: ChatIcon,
+      icon: '💬',
       content: {
         title: '获取技术支持',
         items: [
@@ -227,218 +201,144 @@ export function Help() {
       )
     : helpSections
 
-  const navigationMarkup = (
-    <Navigation location="/">
-      <Navigation.Section
-        items={filteredSections.map(section => ({
-          label: section.title,
-          icon: section.icon,
-          onClick: () => setActiveSection(section.id),
-          selected: activeSection === section.id,
-        }))}
-      />
-    </Navigation>
-  )
-
   return (
-    <div style={{ backgroundColor: 'var(--p-color-bg-subdued)', minHeight: '100vh' }}>
-      <Page
-        title="帮助中心"
-        subtitle="查找使用指南、最佳实践和常见问题解答"
-        backAction={{
-          content: '返回仪表板',
-          onAction: () => navigate('/dashboard')
-        }}
-        primaryAction={{
-          content: '联系支持',
-          icon: ChatIcon,
-          onAction: () => alert('联系支持功能开发中...')
-        }}
-        secondaryActions={[
-          {
-            content: '视频教程',
-            icon: PlayIcon,
-            onAction: () => alert('视频教程功能开发中...')
-          }
-        ]}
-      >
-        <Layout>
-          <Layout.Section>
-            {/* 搜索框 */}
-            <div style={{ marginBottom: 'var(--p-space-4)' }}>
-              <Card>
-                <div style={{ padding: 'var(--p-space-4)' }}>
-                  <TextField
-                    label=""
-                    labelHidden
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    placeholder="🔍 搜索帮助内容..."
-                    prefix={<Icon source={SearchIcon} />}
-                    clearButton
-                    onClearButtonClick={() => setSearchQuery('')}
-                  />
-                </div>
-              </Card>
-            </div>
+    <div className="fade-in">
+      {/* 搜索框 */}
+      <div className="card mb-lg">
+        <div className="card-content">
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <input
+              className="form-input"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="🔍 搜索帮助内容..."
+            />
+          </div>
+        </div>
+      </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 'var(--p-space-6)' }}>
-              {/* 左侧导航 */}
-              <Card>
-                <div style={{ padding: 'var(--p-space-4)' }}>
-                  <Text variant="headingMd" as="h3" style={{ marginBottom: 'var(--p-space-3)' }}>
-                    📖 帮助分类
-                  </Text>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--p-space-1)' }}>
-                    {filteredSections.map((section) => (
-                      <Button
-                        key={section.id}
-                        variant={activeSection === section.id ? 'primary' : 'plain'}
-                        textAlign="left"
-                        fullWidth
-                        icon={section.icon}
-                        onClick={() => setActiveSection(section.id)}
+      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 'var(--space-lg)' }}>
+        {/* 左侧导航 */}
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">📖 帮助分类</h3>
+          </div>
+          <div className="card-content">
+            <div className="flex flex-col gap-xs">
+              {filteredSections.map((section) => (
+                <button
+                  key={section.id}
+                  className={`btn ${activeSection === section.id ? 'btn-primary' : 'btn-secondary'} w-full text-left`}
+                  onClick={() => setActiveSection(section.id)}
+                >
+                  <span className="flex items-center gap-sm">
+                    <span>{section.icon}</span>
+                    <span>{section.title}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 右侧内容 */}
+        <div className="card">
+          <div className="card-content" style={{ padding: 'var(--space-xl)' }}>
+            {currentSection && (
+              <>
+                <div className="mb-xl">
+                  <div className="flex items-center gap-md mb-md">
+                    <span style={{ fontSize: '32px' }}>{currentSection.icon}</span>
+                    <h2 className="text-xl font-bold">
+                      {currentSection.content.title}
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-xl">
+                  {currentSection.content.items.map((item, index) => (
+                    <div key={index} className="card" style={{ 
+                      padding: 'var(--space-lg)',
+                      backgroundColor: 'var(--form-bg-info)',
+                      border: '1px solid var(--border-color)'
+                    }}>
+                      <h3 className="font-semibold mb-md">{item.title}</h3>
+                      <p className="text-secondary mb-lg" style={{ lineHeight: 1.6 }}>
+                        {item.content}
+                      </p>
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => alert(`${item.action} - 功能开发中...`)}
                       >
-                        {section.title}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-
-              {/* 右侧内容 */}
-              <Card>
-                <div style={{ padding: 'var(--p-space-6)' }}>
-                  {currentSection && (
-                    <>
-                      <div style={{ marginBottom: 'var(--p-space-6)' }}>
-                        <Stack alignment="center">
-                          <Icon source={currentSection.icon} />
-                          <Text variant="headingLg" as="h2">
-                            {currentSection.content.title}
-                          </Text>
-                        </Stack>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--p-space-6)' }}>
-                        {currentSection.content.items.map((item, index) => (
-                          <div key={index} style={{ 
-                            padding: 'var(--p-space-5)',
-                            backgroundColor: 'var(--p-color-bg-subdued)',
-                            borderRadius: 'var(--p-border-radius-base)',
-                            border: '1px solid var(--p-color-border-subdued)'
-                          }}>
-                            <Text variant="headingMd" as="h3" style={{ marginBottom: 'var(--p-space-3)' }}>
-                              {item.title}
-                            </Text>
-                            <Text variant="bodyMd" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-4)', lineHeight: 1.6 }}>
-                              {item.content}
-                            </Text>
-                            <Button
-                              variant="primary"
-                              onClick={() => alert(`${item.action} - 功能开发中...`)}
-                            >
-                              {item.action}
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  {searchQuery && filteredSections.length === 0 && (
-                    <div style={{ 
-                      textAlign: 'center', 
-                      padding: 'var(--p-space-8)',
-                    }}>
-                      <div style={{ fontSize: '48px', marginBottom: 'var(--p-space-4)' }}>🔍</div>
-                      <Text variant="headingMd" as="h3" style={{ marginBottom: 'var(--p-space-2)' }}>
-                        未找到相关内容
-                      </Text>
-                      <Text variant="bodyMd" color="subdued" as="p">
-                        试试其他关键词或浏览分类内容
-                      </Text>
+                        {item.action}
+                      </button>
                     </div>
-                  )}
+                  ))}
                 </div>
-              </Card>
+              </>
+            )}
+
+            {searchQuery && filteredSections.length === 0 && (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: 'var(--space-2xl)',
+              }}>
+                <div style={{ fontSize: '4rem', marginBottom: 'var(--space-lg)' }}>🔍</div>
+                <h3 className="font-semibold mb-sm">未找到相关内容</h3>
+                <p className="text-secondary">试试其他关键词或浏览分类内容</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 底部快速链接 */}
+      <div className="card mt-xl">
+        <div className="card-header">
+          <h2 className="card-title">🔗 快速链接</h2>
+        </div>
+        <div className="card-content">
+          <div className="grid grid-4 gap-lg">
+            <div className="card" style={{ 
+              padding: 'var(--space-lg)',
+              backgroundColor: 'var(--form-bg-info)',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '32px', marginBottom: 'var(--space-md)' }}>📚</div>
+              <h4 className="font-medium mb-sm">完整文档</h4>
+              <p className="text-secondary">查看详细的技术文档和集成指南</p>
             </div>
-
-            {/* 底部快速链接 */}
-            <div style={{ marginTop: 'var(--p-space-8)' }}>
-              <Card>
-                <div style={{ padding: 'var(--p-space-6)' }}>
-                  <Text variant="headingLg" as="h3" style={{ marginBottom: 'var(--p-space-4)' }}>
-                    🔗 快速链接
-                  </Text>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--p-space-4)' }}>
-                    <div style={{ 
-                      padding: 'var(--p-space-4)',
-                      backgroundColor: 'var(--p-color-bg-subdued)',
-                      borderRadius: 'var(--p-border-radius-base)',
-                      border: '1px solid var(--p-color-border-subdued)',
-                      textAlign: 'center'
-                    }}>
-                      <Icon source={BookIcon} />
-                      <Text variant="bodyMd" fontWeight="medium" as="p" style={{ margin: 'var(--p-space-2) 0 var(--p-space-1) 0' }}>
-                        完整文档
-                      </Text>
-                      <Text variant="bodySm" color="subdued" as="p">
-                        查看详细的技术文档和集成指南
-                      </Text>
-                    </div>
-                    <div style={{ 
-                      padding: 'var(--p-space-4)',
-                      backgroundColor: 'var(--p-color-bg-subdued)',
-                      borderRadius: 'var(--p-border-radius-base)',
-                      border: '1px solid var(--p-color-border-subdued)',
-                      textAlign: 'center'
-                    }}>
-                      <Icon source={PlayIcon} />
-                      <Text variant="bodyMd" fontWeight="medium" as="p" style={{ margin: 'var(--p-space-2) 0 var(--p-space-1) 0' }}>
-                        视频教程
-                      </Text>
-                      <Text variant="bodySm" color="subdued" as="p">
-                        观看逐步操作视频，快速上手使用
-                      </Text>
-                    </div>
-                    <div style={{ 
-                      padding: 'var(--p-space-4)',
-                      backgroundColor: 'var(--p-color-bg-subdued)',
-                      borderRadius: 'var(--p-border-radius-base)',
-                      border: '1px solid var(--p-color-border-subdued)',
-                      textAlign: 'center'
-                    }}>
-                      <Icon source={LightbulbIcon} />
-                      <Text variant="bodyMd" fontWeight="medium" as="p" style={{ margin: 'var(--p-space-2) 0 var(--p-space-1) 0' }}>
-                        最佳实践
-                      </Text>
-                      <Text variant="bodySm" color="subdued" as="p">
-                        学习行业最佳实践，优化业务流程
-                      </Text>
-                    </div>
-                    <div style={{ 
-                      padding: 'var(--p-space-4)',
-                      backgroundColor: 'var(--p-color-bg-subdued)',
-                      borderRadius: 'var(--p-border-radius-base)',
-                      border: '1px solid var(--p-color-border-subdued)',
-                      textAlign: 'center'
-                    }}>
-                      <Icon source={RocketIcon} />
-                      <Text variant="bodyMd" fontWeight="medium" as="p" style={{ margin: 'var(--p-space-2) 0 var(--p-space-1) 0' }}>
-                        功能更新
-                      </Text>
-                      <Text variant="bodySm" color="subdued" as="p">
-                        了解最新功能和产品路线图
-                      </Text>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+            <div className="card" style={{ 
+              padding: 'var(--space-lg)',
+              backgroundColor: 'var(--form-bg-info)',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '32px', marginBottom: 'var(--space-md)' }}>🎥</div>
+              <h4 className="font-medium mb-sm">视频教程</h4>
+              <p className="text-secondary">观看逐步操作视频，快速上手使用</p>
             </div>
-          </Layout.Section>
-        </Layout>
-      </Page>
+            <div className="card" style={{ 
+              padding: 'var(--space-lg)',
+              backgroundColor: 'var(--form-bg-info)',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '32px', marginBottom: 'var(--space-md)' }}>💡</div>
+              <h4 className="font-medium mb-sm">最佳实践</h4>
+              <p className="text-secondary">学习行业最佳实践，优化业务流程</p>
+            </div>
+            <div className="card" style={{ 
+              padding: 'var(--space-lg)',
+              backgroundColor: 'var(--form-bg-info)',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '32px', marginBottom: 'var(--space-md)' }}>🆕</div>
+              <h4 className="font-medium mb-sm">功能更新</h4>
+              <p className="text-secondary">了解最新功能和产品路线图</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

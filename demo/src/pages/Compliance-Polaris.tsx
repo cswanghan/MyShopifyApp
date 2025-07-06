@@ -1,31 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { 
-  Page, 
-  Layout, 
-  Card, 
-  Badge, 
-  Button, 
-  Tabs, 
-  DataTable,
-  Text,
-  Stack,
-  Banner,
-  ProgressBar,
-  ButtonGroup,
-  Popover,
-  ActionList,
-  TextField,
-  Select
-} from '@shopify/polaris'
 import { useNavigate } from 'react-router-dom'
-import { ExportIcon, AlertTriangleIcon, CheckCircleIcon } from '@shopify/polaris-icons'
 
 export function Compliance() {
   const navigate = useNavigate()
   const [selectedTab, setSelectedTab] = useState(0)
   const [reports, setReports] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [actionsPopoverActive, setActionsPopoverActive] = useState(false)
 
   useEffect(() => {
     // 模拟加载合规数据
@@ -65,20 +45,20 @@ export function Compliance() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'submitted': return <Badge status="info">已提交</Badge>
-      case 'approved': return <Badge status="success">已批准</Badge>
-      case 'processing': return <Badge status="attention">处理中</Badge>
-      case 'rejected': return <Badge status="critical">被拒绝</Badge>
-      default: return <Badge>{status}</Badge>
+      case 'submitted': return <span className="badge badge-info">已提交</span>
+      case 'approved': return <span className="badge badge-success">已批准</span>
+      case 'processing': return <span className="badge badge-warning">处理中</span>
+      case 'rejected': return <span className="badge badge-error">被拒绝</span>
+      default: return <span className="badge badge-default">{status}</span>
     }
   }
 
   const getTypeBadge = (type: string) => {
     switch (type) {
-      case 'IOSS': return <Badge status="info">IOSS</Badge>
-      case 'UK VAT': return <Badge status="critical">UK VAT</Badge>
-      case 'Section 321': return <Badge status="warning">Section 321</Badge>
-      default: return <Badge>{type}</Badge>
+      case 'IOSS': return <span className="badge badge-info">🇪🇺 IOSS</span>
+      case 'UK VAT': return <span className="badge badge-error">🇬🇧 UK VAT</span>
+      case 'Section 321': return <span className="badge badge-warning">🇺🇸 Section 321</span>
+      default: return <span className="badge badge-default">{type}</span>
     }
   }
 
@@ -91,393 +71,308 @@ export function Compliance() {
   }
 
   const tabs = [
-    { id: 'overview', content: '📊 总览' },
-    { id: 'ioss', content: '🇪🇺 IOSS 申报' },
-    { id: 'ukVat', content: '🇬🇧 UK VAT' },
-    { id: 'section321', content: '🇺🇸 Section 321' },
-  ]
-
-  const quickActions = [
-    { content: '生成 IOSS 申报', onAction: () => generateReport('IOSS') },
-    { content: '生成 UK VAT 申报', onAction: () => generateReport('UK VAT') },
-    { content: '生成 Section 321 报告', onAction: () => generateReport('Section 321') },
-    { content: '导出所有报告', onAction: () => generateReport('综合') },
+    { id: 'overview', name: '📊 总览' },
+    { id: 'ioss', name: '🇪🇺 IOSS 申报' },
+    { id: 'ukVat', name: '🇬🇧 UK VAT' },
+    { id: 'section321', name: '🇺🇸 Section 321' },
   ]
 
   const renderOverviewTab = () => (
-    <Layout>
-      <Layout.Section>
-        {/* KPI 指标 */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--p-space-4)', marginBottom: 'var(--p-space-6)' }}>
-          <Card>
-            <div style={{ padding: 'var(--p-space-4)' }}>
-              <Stack distribution="equalSpacing" alignment="center">
-                <div>
-                  <Text variant="bodySm" color="subdued" as="p">IOSS 申报状态</Text>
-                  <Text variant="headingLg" as="h3" style={{ color: 'var(--p-color-text-success)' }}>
-                    ✅ 已提交
-                  </Text>
-                </div>
-              </Stack>
-              <Text variant="bodySm" color="subdued" as="p" style={{ marginTop: 'var(--p-space-2)' }}>
-                下次申报: 2024-03-01
-              </Text>
-            </div>
-          </Card>
-
-          <Card>
-            <div style={{ padding: 'var(--p-space-4)' }}>
-              <Stack distribution="equalSpacing" alignment="center">
-                <div>
-                  <Text variant="bodySm" color="subdued" as="p">UK VAT 申报状态</Text>
-                  <Text variant="headingLg" as="h3" style={{ color: 'var(--p-color-text-success)' }}>
-                    ✅ 已批准
-                  </Text>
-                </div>
-              </Stack>
-              <Text variant="bodySm" color="subdued" as="p" style={{ marginTop: 'var(--p-space-2)' }}>
-                下次申报: 2024-07-01
-              </Text>
-            </div>
-          </Card>
-
-          <Card>
-            <div style={{ padding: 'var(--p-space-4)' }}>
-              <Stack distribution="equalSpacing" alignment="center">
-                <div>
-                  <Text variant="bodySm" color="subdued" as="p">Section 321 利用率</Text>
-                  <Text variant="headingLg" as="h3">94.2%</Text>
-                </div>
-                <Badge status="success">▲ 3.5%</Badge>
-              </Stack>
-            </div>
-          </Card>
-
-          <Card>
-            <div style={{ padding: 'var(--p-space-4)' }}>
-              <Stack distribution="equalSpacing" alignment="center">
-                <div>
-                  <Text variant="bodySm" color="subdued" as="p">整体合规率</Text>
-                  <Text variant="headingLg" as="h3">98.7%</Text>
-                </div>
-                <Badge status="success">▲ 1.2%</Badge>
-              </Stack>
-            </div>
-          </Card>
+    <div>
+      {/* KPI 指标 */}
+      <div className="grid grid-4 mb-lg">
+        <div className="card kpi-card">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: 'var(--space-sm)' }}>🇪🇺</div>
+            <h3 className="kpi-title">IOSS 申报状态</h3>
+            <div className="kpi-value text-success">✅ 已提交</div>
+            <div className="kpi-change">下次申报: 2024-03-01</div>
+          </div>
         </div>
 
-        {/* 风险提醒 */}
-        <div style={{ marginBottom: 'var(--p-space-6)' }}>
-          <Card>
-            <div style={{ padding: 'var(--p-space-4)' }}>
-              <Text variant="headingLg" as="h3" style={{ marginBottom: 'var(--p-space-4)' }}>
-                ⚠️ 合规风险提醒
-              </Text>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--p-space-3)' }}>
-                <Banner status="warning">
-                  <p><strong>🇩🇪 德国订单价值接近阈值</strong></p>
-                  <p>本月德国订单累计价值已达 €142，建议控制在 €150 以下以适用 IOSS</p>
-                </Banner>
-                
-                <Banner status="info">
-                  <p><strong>🇺🇸 Section 321 优化建议</strong></p>
-                  <p>检测到 3 个订单可通过拆分获得更好的关税优惠，预计可节省 $127</p>
-                </Banner>
+        <div className="card kpi-card">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: 'var(--space-sm)' }}>🇬🇧</div>
+            <h3 className="kpi-title">UK VAT 申报状态</h3>
+            <div className="kpi-value text-success">✅ 已批准</div>
+            <div className="kpi-change">下次申报: 2024-07-01</div>
+          </div>
+        </div>
+
+        <div className="card kpi-card">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: 'var(--space-sm)' }}>🇺🇸</div>
+            <h3 className="kpi-title">Section 321 利用率</h3>
+            <div className="kpi-value">94.2%</div>
+            <div className="kpi-change positive">▲ 3.5%</div>
+          </div>
+        </div>
+
+        <div className="card kpi-card">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: 'var(--space-sm)' }}>📊</div>
+            <h3 className="kpi-title">整体合规率</h3>
+            <div className="kpi-value">98.7%</div>
+            <div className="kpi-change positive">▲ 1.2%</div>
+          </div>
+        </div>
+      </div>
+
+      {/* 风险提醒 */}
+      <div className="mb-lg">
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">⚠️ 合规风险提醒</h2>
+          </div>
+          <div className="card-content">
+            <div className="banner banner-warning mb-md">
+              <div>
+                <strong>🇩🇪 德国订单价值接近阈值</strong><br />
+                本月德国订单累计价值已达 €142，建议控制在 €150 以下以适用 IOSS
               </div>
             </div>
-          </Card>
-        </div>
-
-        {/* 最近申报记录 */}
-        <Card>
-          <div style={{ padding: 'var(--p-space-4)' }}>
-            <Stack distribution="equalSpacing" alignment="center">
-              <Text variant="headingLg" as="h3">
-                📋 最近申报记录
-              </Text>
-              <Button
-                variant="primary"
-                onClick={() => setActionsPopoverActive(true)}
-              >
-                快速操作
-              </Button>
-            </Stack>
             
-            <div style={{ marginTop: 'var(--p-space-4)' }}>
-              <DataTable
-                columnContentTypes={['text', 'text', 'text', 'numeric', 'numeric', 'text', 'text']}
-                headings={['申报ID', '类型', '期间', '订单数', '税费金额', '状态', '操作']}
-                rows={reports.map((report) => [
-                  report.id,
-                  getTypeBadge(report.type),
-                  report.period,
-                  report.totalTransactions,
-                  report.type === 'Section 321' ? 
-                    `$${report.totalValue?.toFixed(2)}` : 
-                    `$${report.totalVAT?.toFixed(2)}`,
-                  getStatusBadge(report.status),
-                  <ButtonGroup key={report.id}>
-                    <Button size="slim" onClick={() => alert(`查看 ${report.id} 详情`)}>
-                      查看
-                    </Button>
-                    <Button size="slim" variant="plain" onClick={() => alert(`下载 ${report.id} 报表`)}>
-                      下载
-                    </Button>
-                  </ButtonGroup>
-                ])}
-                footerContent={`共 ${reports.length} 条申报记录`}
-              />
+            <div className="banner banner-info">
+              <div>
+                <strong>🇺🇸 Section 321 优化建议</strong><br />
+                检测到 3 个订单可通过拆分获得更好的关税优惠，预计可节省 $127
+              </div>
             </div>
           </div>
-        </Card>
-      </Layout.Section>
-    </Layout>
+        </div>
+      </div>
+
+      {/* 最近申报记录 */}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">📋 最近申报记录</h2>
+          <button 
+            className="btn btn-primary"
+            disabled={loading}
+          >
+            {loading ? '生成中...' : '快速操作'}
+          </button>
+        </div>
+        <div className="card-content">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>申报ID</th>
+                <th>类型</th>
+                <th>期间</th>
+                <th>订单数</th>
+                <th>税费金额</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reports.map((report) => (
+                <tr key={report.id}>
+                  <td className="font-medium">{report.id}</td>
+                  <td>{getTypeBadge(report.type)}</td>
+                  <td>{report.period}</td>
+                  <td>{report.totalTransactions}</td>
+                  <td>
+                    {report.type === 'Section 321' ? 
+                      `$${report.totalValue?.toFixed(2)}` : 
+                      `$${report.totalVAT?.toFixed(2)}`}
+                  </td>
+                  <td>{getStatusBadge(report.status)}</td>
+                  <td>
+                    <div className="flex gap-sm">
+                      <button className="btn btn-secondary btn-sm">
+                        查看
+                      </button>
+                      <button className="btn btn-secondary btn-sm">
+                        下载
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   )
 
   const renderIOSSTab = () => (
-    <Layout>
-      <Layout.Section>
-        <Card>
-          <div style={{ padding: 'var(--p-space-4)' }}>
-            <Stack distribution="equalSpacing" alignment="center">
-              <Text variant="headingLg" as="h3">
-                🇪🇺 IOSS (Import One-Stop Shop) 申报
-              </Text>
-              <Button
-                variant="primary"
-                loading={loading}
-                onClick={() => generateReport('IOSS')}
-              >
-                {loading ? '生成中...' : '生成新申报'}
-              </Button>
-            </Stack>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--p-space-4)', margin: 'var(--p-space-6) 0' }}>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  本月交易数
-                </Text>
-                <Text variant="heading2xl" as="p">245</Text>
-              </div>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  VAT 总额
-                </Text>
-                <Text variant="heading2xl" as="p">€1,250.75</Text>
-              </div>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  覆盖国家
-                </Text>
-                <Text variant="heading2xl" as="p">5</Text>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: 'var(--p-space-6)' }}>
-              <Text variant="headingMd" as="h4" style={{ marginBottom: 'var(--p-space-3)' }}>
-                按国家分布
-              </Text>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--p-space-3)' }}>
-                {[
-                  { country: '🇩🇪 德国', transactions: 89, vat: 445.20 },
-                  { country: '🇫🇷 法国', transactions: 67, vat: 324.50 },
-                  { country: '🇮🇹 意大利', transactions: 45, vat: 278.30 },
-                  { country: '🇪🇸 西班牙', transactions: 32, vat: 156.75 },
-                  { country: '🇳🇱 荷兰', transactions: 12, vat: 46.00 }
-                ].map((item, index) => (
-                  <div key={index} style={{ 
-                    padding: 'var(--p-space-3)', 
-                    backgroundColor: 'var(--p-color-bg-subdued)', 
-                    borderRadius: 'var(--p-border-radius-base)',
-                    border: '1px solid var(--p-color-border-subdued)'
-                  }}>
-                    <Text variant="bodyMd" fontWeight="medium" as="p" style={{ marginBottom: 'var(--p-space-05)' }}>
-                      {item.country}
-                    </Text>
-                    <Text variant="bodySm" color="subdued" as="p">
-                      {item.transactions} 笔订单 | €{item.vat}
-                    </Text>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Banner status="info">
-              <p><strong>💡 IOSS 申报提醒</strong></p>
-              <ul>
-                <li>下次申报截止日期：2024年3月1日</li>
-                <li>当前月度交易已接近建议阈值，建议及时申报</li>
-                <li>所有€150以下订单均已包含在IOSS申报范围内</li>
-              </ul>
-            </Banner>
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">🇪🇺 IOSS (Import One-Stop Shop) 申报</h2>
+        <button 
+          className="btn btn-primary"
+          disabled={loading}
+          onClick={() => generateReport('IOSS')}
+        >
+          {loading ? '生成中...' : '生成新申报'}
+        </button>
+      </div>
+      <div className="card-content">
+        <div className="grid grid-3 mb-lg">
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">本月交易数</h4>
+            <div className="text-xl font-bold">245</div>
           </div>
-        </Card>
-      </Layout.Section>
-    </Layout>
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">VAT 总额</h4>
+            <div className="text-xl font-bold">€1,250.75</div>
+          </div>
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">覆盖国家</h4>
+            <div className="text-xl font-bold">5</div>
+          </div>
+        </div>
+
+        <div className="mb-lg">
+          <h3 className="font-semibold mb-md">按国家分布</h3>
+          <div className="grid grid-2 gap-md">
+            {[
+              { country: '🇩🇪 德国', transactions: 89, vat: 445.20 },
+              { country: '🇫🇷 法国', transactions: 67, vat: 324.50 },
+              { country: '🇮🇹 意大利', transactions: 45, vat: 278.30 },
+              { country: '🇪🇸 西班牙', transactions: 32, vat: 156.75 },
+              { country: '🇳🇱 荷兰', transactions: 12, vat: 46.00 }
+            ].map((item, index) => (
+              <div key={index} className="card" style={{ padding: 'var(--space-md)' }}>
+                <div className="font-medium mb-xs">{item.country}</div>
+                <div className="text-secondary">{item.transactions} 笔订单 | €{item.vat}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="banner banner-info">
+          <div>
+            <strong>💡 IOSS 申报提醒</strong><br />
+            <ul style={{ marginTop: 'var(--space-sm)', paddingLeft: 'var(--space-lg)' }}>
+              <li>下次申报截止日期：2024年3月1日</li>
+              <li>当前月度交易已接近建议阈值，建议及时申报</li>
+              <li>所有€150以下订单均已包含在IOSS申报范围内</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 
   const renderUKVATTab = () => (
-    <Layout>
-      <Layout.Section>
-        <Card>
-          <div style={{ padding: 'var(--p-space-4)' }}>
-            <Stack distribution="equalSpacing" alignment="center">
-              <Text variant="headingLg" as="h3">
-                🇬🇧 UK VAT 申报
-              </Text>
-              <Button
-                variant="primary"
-                loading={loading}
-                onClick={() => generateReport('UK VAT')}
-              >
-                {loading ? '生成中...' : '生成季度申报'}
-              </Button>
-            </Stack>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--p-space-4)', margin: 'var(--p-space-6) 0' }}>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  本季度交易数
-                </Text>
-                <Text variant="heading2xl" as="p">89</Text>
-              </div>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  VAT 应付总额
-                </Text>
-                <Text variant="heading2xl" as="p">£890.25</Text>
-              </div>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  低价值救济适用率
-                </Text>
-                <Text variant="heading2xl" as="p">94%</Text>
-              </div>
-            </div>
-
-            <Banner status="success">
-              <p><strong>✅ UK VAT 申报状态</strong></p>
-              <ul>
-                <li>Q1 2024 申报已提交并获得批准</li>
-                <li>下次申报期间：2024年7月1日 - 8月7日</li>
-                <li>£135以下订单已自动包含VAT，无需边境缴税</li>
-              </ul>
-            </Banner>
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">🇬🇧 UK VAT 申报</h2>
+        <button 
+          className="btn btn-primary"
+          disabled={loading}
+          onClick={() => generateReport('UK VAT')}
+        >
+          {loading ? '生成中...' : '生成季度申报'}
+        </button>
+      </div>
+      <div className="card-content">
+        <div className="grid grid-3 mb-lg">
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">本季度交易数</h4>
+            <div className="text-xl font-bold">89</div>
           </div>
-        </Card>
-      </Layout.Section>
-    </Layout>
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">VAT 应付总额</h4>
+            <div className="text-xl font-bold">£890.25</div>
+          </div>
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">低价值救济适用率</h4>
+            <div className="text-xl font-bold">94%</div>
+          </div>
+        </div>
+
+        <div className="banner banner-success">
+          <div>
+            <strong>✅ UK VAT 申报状态</strong><br />
+            <ul style={{ marginTop: 'var(--space-sm)', paddingLeft: 'var(--space-lg)' }}>
+              <li>Q1 2024 申报已提交并获得批准</li>
+              <li>下次申报期间：2024年7月1日 - 8月7日</li>
+              <li>£135以下订单已自动包含VAT，无需边境缴税</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 
   const renderSection321Tab = () => (
-    <Layout>
-      <Layout.Section>
-        <Card>
-          <div style={{ padding: 'var(--p-space-4)' }}>
-            <Stack distribution="equalSpacing" alignment="center">
-              <Text variant="headingLg" as="h3">
-                🇺🇸 Section 321 de minimis
-              </Text>
-              <Button
-                variant="primary"
-                loading={loading}
-                onClick={() => generateReport('Section 321')}
-              >
-                {loading ? '生成中...' : '生成月度报告'}
-              </Button>
-            </Stack>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--p-space-4)', margin: 'var(--p-space-6) 0' }}>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  本月符合条件订单
-                </Text>
-                <Text variant="heading2xl" as="p">156</Text>
-              </div>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  总订单价值
-                </Text>
-                <Text variant="heading2xl" as="p">$45,620</Text>
-              </div>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  利用率
-                </Text>
-                <Text variant="heading2xl" as="p">94.2%</Text>
-              </div>
-              <div style={{ padding: 'var(--p-space-4)', backgroundColor: 'var(--p-color-bg-subdued)', borderRadius: 'var(--p-border-radius-base)' }}>
-                <Text variant="bodySm" color="subdued" as="p" style={{ marginBottom: 'var(--p-space-1)' }}>
-                  节省关税
-                </Text>
-                <Text variant="heading2xl" as="p">$2,281</Text>
-              </div>
-            </div>
-
-            <Banner status="warning">
-              <p><strong>⚠️ Section 321 注意事项</strong></p>
-              <ul>
-                <li>订单价值必须≤$800才能享受免税</li>
-                <li>同一收件人24小时内订单总价值不能超过$800</li>
-                <li>纺织品、食品等特定商品类别不适用此政策</li>
-                <li>当前有3个订单建议拆分以获得更好优惠</li>
-              </ul>
-            </Banner>
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">🇺🇸 Section 321 de minimis</h2>
+        <button 
+          className="btn btn-primary"
+          disabled={loading}
+          onClick={() => generateReport('Section 321')}
+        >
+          {loading ? '生成中...' : '生成月度报告'}
+        </button>
+      </div>
+      <div className="card-content">
+        <div className="grid grid-4 mb-lg">
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">本月符合条件订单</h4>
+            <div className="text-xl font-bold">156</div>
           </div>
-        </Card>
-      </Layout.Section>
-    </Layout>
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">总订单价值</h4>
+            <div className="text-xl font-bold">$45,620</div>
+          </div>
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">利用率</h4>
+            <div className="text-xl font-bold">94.2%</div>
+          </div>
+          <div className="card" style={{ padding: 'var(--space-lg)', backgroundColor: 'var(--form-bg-info)' }}>
+            <h4 className="text-secondary mb-sm">节省关税</h4>
+            <div className="text-xl font-bold">$2,281</div>
+          </div>
+        </div>
+
+        <div className="banner banner-warning">
+          <div>
+            <strong>⚠️ Section 321 注意事项</strong><br />
+            <ul style={{ marginTop: 'var(--space-sm)', paddingLeft: 'var(--space-lg)' }}>
+              <li>订单价值必须≤$800才能享受免税</li>
+              <li>同一收件人24小时内订单总价值不能超过$800</li>
+              <li>纺织品、食品等特定商品类别不适用此政策</li>
+              <li>当前有3个订单建议拆分以获得更好优惠</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 
   return (
-    <div style={{ backgroundColor: 'var(--p-color-bg-subdued)', minHeight: '100vh' }}>
-      <Page
-        title="合规申报"
-        subtitle="管理IOSS、UK VAT、Section 321等跨境税务合规申报"
-        backAction={{
-          content: '返回仪表板',
-          onAction: () => navigate('/dashboard')
-        }}
-        primaryAction={{
-          content: '生成报告',
-          icon: ExportIcon,
-          onAction: () => setActionsPopoverActive(true)
-        }}
-        secondaryActions={[
-          {
-            content: '合规检查',
-            icon: CheckCircleIcon,
-            onAction: () => alert('合规检查功能开发中...')
-          }
-        ]}
-      >
-        <Layout>
-          <Layout.Section>
-            <Card>
-              <Tabs tabs={tabs} selected={selectedTab} onSelect={setSelectedTab}>
-                <div style={{ padding: 'var(--p-space-4)' }}>
-                  {selectedTab === 0 && renderOverviewTab()}
-                  {selectedTab === 1 && renderIOSSTab()}
-                  {selectedTab === 2 && renderUKVATTab()}
-                  {selectedTab === 3 && renderSection321Tab()}
-                </div>
-              </Tabs>
-            </Card>
-          </Layout.Section>
-        </Layout>
-
-        {/* 快速操作 Popover */}
-        <div style={{ position: 'fixed', top: 0, right: 0, zIndex: 9999 }}>
-          <Popover
-            active={actionsPopoverActive}
-            activator={<div></div>}
-            onClose={() => setActionsPopoverActive(false)}
-          >
-            <ActionList items={quickActions} />
-          </Popover>
+    <div className="fade-in">
+      {/* Tab 导航 */}
+      <div className="card mb-lg">
+        <div className="card-content" style={{ padding: 'var(--space-md)' }}>
+          <div className="flex gap-md">
+            {tabs.map((tab, index) => (
+              <button
+                key={tab.id}
+                className={`btn ${selectedTab === index ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setSelectedTab(index)}
+              >
+                {tab.name}
+              </button>
+            ))}
+          </div>
         </div>
-      </Page>
+      </div>
+
+      {/* Tab 内容 */}
+      <div>
+        {selectedTab === 0 && renderOverviewTab()}
+        {selectedTab === 1 && renderIOSSTab()}
+        {selectedTab === 2 && renderUKVATTab()}
+        {selectedTab === 3 && renderSection321Tab()}
+      </div>
     </div>
   )
 }

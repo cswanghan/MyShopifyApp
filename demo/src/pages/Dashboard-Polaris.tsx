@@ -1,12 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { 
-  OrderIcon, 
-  ProductIcon, 
-  ChartVerticalIcon, 
-  DeliveryIcon,
-  SettingsIcon,
-  ExternalIcon
-} from '@shopify/polaris-icons'
 import { useNavigate } from 'react-router-dom'
 
 export function Dashboard() {
@@ -20,14 +12,14 @@ export function Dashboard() {
     apiSuccess: 0
   })
 
-  // KPI数据 - 遵循Polaris设计原则
+  // KPI数据
   const kpiData = [
     {
       id: 'orders',
       title: '总订单 (含税)',
       value: 1820,
       change: { value: 6.2, positive: true, period: 'vs 上月' },
-      icon: OrderIcon,
+      icon: '📦',
       color: 'success'
     },
     {
@@ -36,7 +28,7 @@ export function Dashboard() {
       value: 21450,
       prefix: '$',
       change: { value: 5.8, positive: true, period: 'vs 上月' },
-      icon: ChartVerticalIcon,
+      icon: '💰',
       color: 'info'
     },
     {
@@ -46,7 +38,7 @@ export function Dashboard() {
       suffix: '%',
       prefix: '+',
       change: { value: null, positive: true, period: '目标: ≥ 6%' },
-      icon: ProductIcon,
+      icon: '📈',
       color: 'success'
     },
     {
@@ -55,7 +47,7 @@ export function Dashboard() {
       value: 92.5,
       suffix: '%',
       change: { value: 12.5, positive: true, period: 'vs 上月' },
-      icon: DeliveryIcon,
+      icon: '🇪🇺',
       color: 'warning'
     },
     {
@@ -64,7 +56,7 @@ export function Dashboard() {
       value: 98.1,
       suffix: '%',
       change: { value: 0.5, positive: true, period: 'vs 上月' },
-      icon: SettingsIcon,
+      icon: '🚚',
       color: 'success'
     },
     {
@@ -73,7 +65,7 @@ export function Dashboard() {
       value: 99.98,
       suffix: '%',
       change: { value: null, positive: true, period: 'SLA: ≥ 99.9%' },
-      icon: ExternalIcon,
+      icon: '⚡',
       color: 'info'
     }
   ]
@@ -115,8 +107,8 @@ export function Dashboard() {
     })
   }, [])
 
-  // Polaris风格的KPI卡片组件
-  const PolarisKpiCard = ({ kpi }: { kpi: any }) => {
+  // KPI卡片组件
+  const KpiCard = ({ kpi }: { kpi: any }) => {
     const animatedValue = animatedValues[kpi.id as keyof typeof animatedValues]
     
     const formatValue = (value: number) => {
@@ -128,97 +120,71 @@ export function Dashboard() {
       return Math.floor(value).toLocaleString()
     }
 
-    const getBadgeVariant = () => {
-      if (!kpi.change.value) return 'info'
-      return kpi.change.positive ? 'success' : 'critical'
+    const getBadgeClass = () => {
+      if (!kpi.change.value) return 'badge-info'
+      return kpi.change.positive ? 'badge-success' : 'badge-error'
     }
 
     return (
-      <div className="polaris-card polaris-fade-in">
-        <div className="polaris-card__section">
-          {/* 卡片标题 */}
-          <h3 className="polaris-text polaris-text--body-sm polaris-text--subdued" style={{ marginBottom: 'var(--p-space-1)' }}>
-            {kpi.title}
-          </h3>
-          
-          {/* 主要数值 */}
-          <div className="polaris-text polaris-text--heading-2xl" style={{ marginBottom: 'var(--p-space-2)' }}>
+      <div className="card kpi-card fade-in">
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '24px', marginBottom: 'var(--space-sm)' }}>
+            {kpi.icon}
+          </div>
+          <h3 className="kpi-title">{kpi.title}</h3>
+          <div className="kpi-value">
             {kpi.prefix && kpi.prefix}
             {formatValue(animatedValue)}
             {kpi.suffix && kpi.suffix}
           </div>
-          
-          {/* 变化指标 */}
-          <div className={`polaris-badge polaris-badge--${getBadgeVariant()}`}>
-            {kpi.change.value && `${kpi.change.positive ? '↗' : '↘'} ${kpi.change.value}%`} {kpi.change.period}
+          <div className={`kpi-change ${kpi.change.positive ? 'positive' : 'negative'}`}>
+            {kpi.change.value && `${kpi.change.positive ? '▲' : '▼'} ${kpi.change.value}%`} {kpi.change.period}
           </div>
         </div>
       </div>
     )
   }
 
-  // Polaris横幅组件
-  const PolarisSuccessBanner = () => (
-    <div className="polaris-banner polaris-banner--success" style={{ marginBottom: 'var(--p-space-4)' }}>
-      <div className="polaris-banner__icon">
-        <span style={{ fontSize: '1.25rem' }}>✓</span>
-      </div>
-      <div className="polaris-banner__content">
-        <div className="polaris-banner__title">DTax-Bridge 运行正常</div>
-        <div className="polaris-banner__text">
+  return (
+    <div className="fade-in">
+      {/* 状态横幅 */}
+      <div className="banner banner-success mb-lg">
+        <div>
+          <strong>✅ DTax-Bridge 运行正常</strong><br />
           所有系统运行正常，税费计算和物流服务可用。上次检查：{new Date().toLocaleTimeString()}
         </div>
       </div>
-    </div>
-  )
-
-  return (
-    <div className="polaris-layout polaris-layout--single-column">
-      {/* 状态横幅 */}
-      <PolarisSuccessBanner />
       
-      {/* KPI 指标网格 - 使用Polaris网格系统 */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-        gap: 'var(--p-space-3)',
-        marginBottom: 'var(--p-space-4)'
-      }}>
+      {/* KPI 指标网格 */}
+      <div className="grid grid-3 mb-lg">
         {kpiData.map((kpi) => (
-          <PolarisKpiCard key={kpi.id} kpi={kpi} />
+          <KpiCard key={kpi.id} kpi={kpi} />
         ))}
       </div>
 
       {/* 订单趋势图表 */}
-      <div className="polaris-card polaris-scale-in">
-        <div className="polaris-card__section">
-          <h2 className="polaris-text polaris-text--heading-xl" style={{ marginBottom: 'var(--p-space-2)' }}>
-            订单趋势分析
-          </h2>
-          <p className="polaris-text polaris-text--body-md polaris-text--subdued" style={{ marginBottom: 'var(--p-space-4)' }}>
-            近30天的订单模式变化趋势，DDP订单增长显著
-          </p>
-          
+      <div className="card mb-lg">
+        <div className="card-header">
+          <h2 className="card-title">📊 订单趋势分析</h2>
+          <p className="card-subtitle">近30天的订单模式变化趋势，DDP订单增长显著</p>
+        </div>
+        <div className="card-content">
           <div style={{ 
             height: '300px',
-            backgroundColor: 'var(--p-color-bg-subdued)',
-            borderRadius: 'var(--p-border-radius-base)',
+            backgroundColor: 'var(--form-bg-info)',
+            borderRadius: 'var(--border-radius)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
-            border: '2px dashed var(--p-color-border)'
+            border: '2px dashed var(--border-color)'
           }}>
             <div>
-              <div style={{ fontSize: '3rem', marginBottom: 'var(--p-space-2)' }}>📊</div>
-              <h3 className="polaris-text polaris-text--heading-md" style={{ marginBottom: 'var(--p-space-1)' }}>
-                订单趋势图表
-              </h3>
-              <p className="polaris-text polaris-text--body-md polaris-text--subdued" style={{ marginBottom: 'var(--p-space-3)' }}>
-                集成Chart.js图表组件显示详细趋势
-              </p>
+              <div style={{ fontSize: '4rem', marginBottom: 'var(--space-md)' }}>📈</div>
+              <h3 className="text-lg font-semibold mb-sm">订单趋势图表</h3>
+              <p className="text-secondary mb-md">集成Chart.js图表组件显示详细趋势</p>
               <button 
-                className="polaris-button polaris-button--primary"
+                className="btn btn-primary"
                 onClick={() => navigate('/reports')}
               >
                 查看详细报表
@@ -229,110 +195,78 @@ export function Dashboard() {
       </div>
 
       {/* 快速操作卡片 */}
-      <div className="polaris-card polaris-scale-in" style={{ marginTop: 'var(--p-space-4)' }}>
-        <div className="polaris-card__section">
-          <h2 className="polaris-text polaris-text--heading-xl" style={{ marginBottom: 'var(--p-space-2)' }}>
-            快速操作
-          </h2>
-          <p className="polaris-text polaris-text--body-md polaris-text--subdued" style={{ marginBottom: 'var(--p-space-4)' }}>
-            常用功能快速入口，提升工作效率
-          </p>
-          
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: 'var(--p-space-3)'
-          }}>
+      <div className="card mb-lg">
+        <div className="card-header">
+          <h2 className="card-title">⚡ 快速操作</h2>
+          <p className="card-subtitle">常用功能快速入口，提升工作效率</p>
+        </div>
+        <div className="card-content">
+          <div className="grid grid-4 gap-md">
             <button 
-              className="polaris-button polaris-button--primary"
+              className="btn btn-primary"
               onClick={() => navigate('/settings/tax')}
-              style={{ justifySelf: 'stretch' }}
             >
-              <SettingsIcon />
-              <span style={{ marginLeft: 'var(--p-space-1)' }}>税费设置</span>
+              🧾 税费设置
             </button>
             
             <button 
-              className="polaris-button polaris-button--default"
+              className="btn btn-secondary"
               onClick={() => navigate('/settings/logistics')}
-              style={{ justifySelf: 'stretch' }}
             >
-              <DeliveryIcon />
-              <span style={{ marginLeft: 'var(--p-space-1)' }}>物流配置</span>
+              🚚 物流配置
             </button>
             
             <button 
-              className="polaris-button polaris-button--default"
-              onClick={() => navigate('/reports')}
-              style={{ justifySelf: 'stretch' }}
+              className="btn btn-secondary"
+              onClick={() => navigate('/compliance')}
             >
-              <ChartVerticalIcon />
-              <span style={{ marginLeft: 'var(--p-space-1)' }}>数据报表</span>
+              📋 合规申报
             </button>
             
             <button 
-              className="polaris-button polaris-button--default"
+              className="btn btn-secondary"
               onClick={() => navigate('/help')}
-              style={{ justifySelf: 'stretch' }}
             >
-              <ExternalIcon />
-              <span style={{ marginLeft: 'var(--p-space-1)' }}>帮助文档</span>
+              ❓ 帮助文档
             </button>
           </div>
         </div>
       </div>
 
       {/* 系统状态指示器 */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-        gap: 'var(--p-space-3)',
-        marginTop: 'var(--p-space-4)'
-      }}>
-        <div className="polaris-card">
-          <div className="polaris-card__section">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="grid grid-3">
+        <div className="card">
+          <div className="card-content">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="polaris-text polaris-text--body-md" style={{ marginBottom: 'var(--p-space-05)' }}>
-                  税费计算引擎
-                </h3>
-                <p className="polaris-text polaris-text--body-sm polaris-text--subdued">
-                  运行状态正常
-                </p>
+                <h3 className="font-medium mb-sm">⚙️ 税费计算引擎</h3>
+                <p className="text-secondary">运行状态正常</p>
               </div>
-              <div className="polaris-badge polaris-badge--success">正常</div>
+              <span className="badge badge-success">正常</span>
             </div>
           </div>
         </div>
         
-        <div className="polaris-card">
-          <div className="polaris-card__section">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="card">
+          <div className="card-content">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="polaris-text polaris-text--body-md" style={{ marginBottom: 'var(--p-space-05)' }}>
-                  物流集成服务
-                </h3>
-                <p className="polaris-text polaris-text--body-sm polaris-text--subdued">
-                  所有渠道可用
-                </p>
+                <h3 className="font-medium mb-sm">🚛 物流集成服务</h3>
+                <p className="text-secondary">所有渠道可用</p>
               </div>
-              <div className="polaris-badge polaris-badge--success">正常</div>
+              <span className="badge badge-success">正常</span>
             </div>
           </div>
         </div>
         
-        <div className="polaris-card">
-          <div className="polaris-card__section">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="card">
+          <div className="card-content">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="polaris-text polaris-text--body-md" style={{ marginBottom: 'var(--p-space-05)' }}>
-                  合规申报系统
-                </h3>
-                <p className="polaris-text polaris-text--body-sm polaris-text--subdued">
-                  IOSS/VAT同步中
-                </p>
+                <h3 className="font-medium mb-sm">📊 合规申报系统</h3>
+                <p className="text-secondary">IOSS/VAT同步中</p>
               </div>
-              <div className="polaris-badge polaris-badge--warning">同步中</div>
+              <span className="badge badge-warning">同步中</span>
             </div>
           </div>
         </div>
