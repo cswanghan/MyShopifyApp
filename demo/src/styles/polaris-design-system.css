@@ -1,0 +1,545 @@
+/* DTax-Bridge Polaris设计系统 - 基于design_std.html规范 */
+
+/* 新的Polaris设计令牌 */
+:root {
+  /* Polaris核心颜色系统 */
+  --p-color-bg-primary: #2c6ecb;
+  --p-color-bg-surface: #ffffff;
+  --p-color-bg-subdued: #f9fafb;
+  --p-color-text: #202223;
+  --p-color-text-subdued: #6d7175;
+  --p-color-text-critical: #d82c0d;
+  --p-color-text-success: #008060;
+  --p-color-text-info: #007a82;
+  --p-color-border: #c9cccf;
+  --p-color-border-subdued: #e1e3e5;
+  
+  /* 语义化背景色 */
+  --p-color-bg-surface-success: #dffcf0;
+  --p-color-bg-surface-critical: #ffedeb;
+  --p-color-bg-surface-warning: #fff7c7;
+  --p-color-bg-surface-info: #e7f7f8;
+  
+  /* Polaris间距系统 */
+  --p-space-025: 0.125rem; /* 2px */
+  --p-space-05: 0.25rem;   /* 4px */
+  --p-space-1: 0.5rem;     /* 8px */
+  --p-space-2: 1rem;       /* 16px */
+  --p-space-3: 1.5rem;     /* 24px */
+  --p-space-4: 2rem;       /* 32px */
+  --p-space-5: 2.5rem;     /* 40px */
+  --p-space-6: 3rem;       /* 48px */
+  
+  /* Polaris边框圆角 */
+  --p-border-radius-base: 0.5rem;   /* 8px */
+  --p-border-radius-large: 0.75rem; /* 12px */
+  --p-border-radius-full: 9999px;
+  
+  /* Polaris阴影系统 */
+  --p-shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --p-shadow-card-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --p-shadow-popover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Polaris字体系统 */
+  --p-font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --p-font-size-75: 0.75rem;   /* 12px */
+  --p-font-size-100: 0.875rem; /* 14px */
+  --p-font-size-200: 1rem;     /* 16px */
+  --p-font-size-300: 1.125rem; /* 18px */
+  --p-font-size-400: 1.25rem;  /* 20px */
+  --p-font-size-500: 1.5rem;   /* 24px */
+  --p-font-size-600: 2rem;     /* 32px */
+  
+  /* Polaris断点系统 */
+  --p-breakpoint-xs: 489px;
+  --p-breakpoint-sm: 767px;
+  --p-breakpoint-md: 1039px;
+  --p-breakpoint-lg: 1399px;
+  --p-breakpoint-xl: 1440px;
+}
+
+/* 基础重置和字体设置 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--p-font-family-sans);
+  background-color: var(--p-color-bg-subdued);
+  color: var(--p-color-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+/* Polaris卡片组件 */
+.polaris-card {
+  background-color: var(--p-color-bg-surface);
+  border-radius: var(--p-border-radius-base);
+  box-shadow: var(--p-shadow-card);
+  border: 1px solid var(--p-color-border-subdued);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.polaris-card:hover {
+  box-shadow: var(--p-shadow-card-hover);
+  transform: translateY(-1px);
+}
+
+.polaris-card__section {
+  padding: var(--p-space-3);
+}
+
+.polaris-card__section + .polaris-card__section {
+  border-top: 1px solid var(--p-color-border-subdued);
+}
+
+/* Polaris按钮系统 */
+.polaris-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--p-space-1) var(--p-space-2);
+  border-radius: var(--p-border-radius-base);
+  font-size: var(--p-font-size-100);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  min-height: 44px; /* 可访问性要求 */
+  font-family: var(--p-font-family-sans);
+}
+
+.polaris-button--primary {
+  background-color: var(--p-color-bg-primary);
+  color: white;
+  border-color: var(--p-color-bg-primary);
+}
+
+.polaris-button--primary:hover {
+  background-color: #255dab;
+  border-color: #255dab;
+  transform: translateY(-1px);
+}
+
+.polaris-button--primary:focus {
+  outline: 2px solid var(--p-color-bg-primary);
+  outline-offset: 2px;
+}
+
+.polaris-button--default {
+  background-color: var(--p-color-bg-surface);
+  color: var(--p-color-text);
+  border-color: var(--p-color-border);
+}
+
+.polaris-button--default:hover {
+  background-color: #f6f6f7;
+  border-color: #b0b7bd;
+}
+
+.polaris-button--critical {
+  background-color: var(--p-color-text-critical);
+  color: white;
+  border-color: var(--p-color-text-critical);
+}
+
+.polaris-button--critical:hover {
+  background-color: #c5280c;
+  border-color: #c5280c;
+}
+
+/* Polaris徽章系统 */
+.polaris-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--p-space-025) var(--p-space-1);
+  border-radius: var(--p-border-radius-full);
+  font-size: var(--p-font-size-75);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.polaris-badge--success {
+  background-color: var(--p-color-bg-surface-success);
+  color: var(--p-color-text-success);
+}
+
+.polaris-badge--critical {
+  background-color: var(--p-color-bg-surface-critical);
+  color: var(--p-color-text-critical);
+}
+
+.polaris-badge--warning {
+  background-color: var(--p-color-bg-surface-warning);
+  color: #926818;
+}
+
+.polaris-badge--info {
+  background-color: var(--p-color-bg-surface-info);
+  color: var(--p-color-text-info);
+}
+
+.polaris-badge--default {
+  background-color: #e4e5e7;
+  color: #5c5f62;
+}
+
+/* Polaris排版系统 */
+.polaris-text {
+  font-family: var(--p-font-family-sans);
+  margin: 0;
+}
+
+.polaris-text--heading-2xl {
+  font-size: var(--p-font-size-600);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--p-color-text);
+}
+
+.polaris-text--heading-xl {
+  font-size: var(--p-font-size-500);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--p-color-text);
+}
+
+.polaris-text--heading-lg {
+  font-size: var(--p-font-size-400);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--p-color-text);
+}
+
+.polaris-text--heading-md {
+  font-size: var(--p-font-size-300);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--p-color-text);
+}
+
+.polaris-text--body-lg {
+  font-size: var(--p-font-size-200);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--p-color-text);
+}
+
+.polaris-text--body-md {
+  font-size: var(--p-font-size-100);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--p-color-text);
+}
+
+.polaris-text--body-sm {
+  font-size: var(--p-font-size-75);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--p-color-text-subdued);
+}
+
+.polaris-text--subdued {
+  color: var(--p-color-text-subdued);
+}
+
+/* Polaris表单组件 */
+.polaris-form-group {
+  margin-bottom: var(--p-space-3);
+}
+
+.polaris-label {
+  display: block;
+  font-size: var(--p-font-size-100);
+  font-weight: 500;
+  color: var(--p-color-text);
+  margin-bottom: var(--p-space-05);
+}
+
+.polaris-input {
+  width: 100%;
+  padding: var(--p-space-1) var(--p-space-2);
+  border: 1px solid var(--p-color-border);
+  border-radius: var(--p-border-radius-base);
+  font-size: var(--p-font-size-100);
+  font-family: var(--p-font-family-sans);
+  color: var(--p-color-text);
+  background-color: var(--p-color-bg-surface);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 44px;
+}
+
+.polaris-input:focus {
+  outline: none;
+  border-color: var(--p-color-bg-primary);
+  box-shadow: 0 0 0 2px rgba(44, 110, 203, 0.2);
+}
+
+.polaris-input--error {
+  border-color: var(--p-color-text-critical);
+}
+
+.polaris-input--error:focus {
+  border-color: var(--p-color-text-critical);
+  box-shadow: 0 0 0 2px rgba(216, 44, 13, 0.2);
+}
+
+/* Polaris选择器 */
+.polaris-select {
+  position: relative;
+  width: 100%;
+}
+
+.polaris-select__input {
+  width: 100%;
+  padding: var(--p-space-1) var(--p-space-2);
+  padding-right: var(--p-space-5);
+  border: 1px solid var(--p-color-border);
+  border-radius: var(--p-border-radius-base);
+  font-size: var(--p-font-size-100);
+  font-family: var(--p-font-family-sans);
+  color: var(--p-color-text);
+  background-color: var(--p-color-bg-surface);
+  appearance: none;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.polaris-select__input:focus {
+  outline: none;
+  border-color: var(--p-color-bg-primary);
+  box-shadow: 0 0 0 2px rgba(44, 110, 203, 0.2);
+}
+
+.polaris-select::after {
+  content: '';
+  position: absolute;
+  right: var(--p-space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--p-color-text-subdued);
+  pointer-events: none;
+}
+
+/* Polaris数据表格 */
+.polaris-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--p-color-bg-surface);
+  border-radius: var(--p-border-radius-base);
+  overflow: hidden;
+  box-shadow: var(--p-shadow-card);
+}
+
+.polaris-data-table__header {
+  background-color: var(--p-color-bg-subdued);
+}
+
+.polaris-data-table__cell {
+  padding: var(--p-space-2) var(--p-space-3);
+  border-bottom: 1px solid var(--p-color-border-subdued);
+  font-size: var(--p-font-size-100);
+  text-align: left;
+}
+
+.polaris-data-table__header .polaris-data-table__cell {
+  font-weight: 600;
+  color: var(--p-color-text);
+  text-transform: uppercase;
+  font-size: var(--p-font-size-75);
+  letter-spacing: 0.025em;
+}
+
+.polaris-data-table__row:hover {
+  background-color: #f9fafb;
+}
+
+/* Polaris横幅组件 */
+.polaris-banner {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--p-space-2);
+  border-radius: var(--p-border-radius-base);
+  margin-bottom: var(--p-space-3);
+}
+
+.polaris-banner--success {
+  background-color: var(--p-color-bg-surface-success);
+  border: 1px solid #b8e6d1;
+}
+
+.polaris-banner--critical {
+  background-color: var(--p-color-bg-surface-critical);
+  border: 1px solid #fdb8b0;
+}
+
+.polaris-banner--warning {
+  background-color: var(--p-color-bg-surface-warning);
+  border: 1px solid #f4d971;
+}
+
+.polaris-banner--info {
+  background-color: var(--p-color-bg-surface-info);
+  border: 1px solid #b8d4d6;
+}
+
+.polaris-banner__icon {
+  margin-right: var(--p-space-2);
+  margin-top: var(--p-space-025);
+  flex-shrink: 0;
+}
+
+.polaris-banner__content {
+  flex: 1;
+}
+
+.polaris-banner__title {
+  font-size: var(--p-font-size-100);
+  font-weight: 600;
+  margin-bottom: var(--p-space-05);
+}
+
+.polaris-banner__text {
+  font-size: var(--p-font-size-100);
+  line-height: 1.5;
+}
+
+.polaris-banner--success .polaris-banner__title,
+.polaris-banner--success .polaris-banner__text {
+  color: var(--p-color-text-success);
+}
+
+.polaris-banner--critical .polaris-banner__title,
+.polaris-banner--critical .polaris-banner__text {
+  color: var(--p-color-text-critical);
+}
+
+/* 响应式布局系统 */
+.polaris-layout {
+  display: grid;
+  gap: var(--p-space-3);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--p-space-3);
+}
+
+.polaris-layout--single-column {
+  grid-template-columns: 1fr;
+}
+
+.polaris-layout--two-column {
+  grid-template-columns: 2fr 1fr;
+}
+
+.polaris-layout--three-column {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* 响应式断点 */
+@media (max-width: 767px) {
+  .polaris-layout--two-column,
+  .polaris-layout--three-column {
+    grid-template-columns: 1fr;
+  }
+  
+  .polaris-layout {
+    padding: 0 var(--p-space-2);
+  }
+  
+  .polaris-card__section {
+    padding: var(--p-space-2);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1039px) {
+  .polaris-layout--three-column {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* 工具类 */
+.polaris-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.polaris-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 动画和过渡 */
+.polaris-fade-in {
+  animation: polaris-fade-in 0.3s ease-out;
+}
+
+@keyframes polaris-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.polaris-scale-in {
+  animation: polaris-scale-in 0.2s ease-out;
+}
+
+@keyframes polaris-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 焦点管理 */
+.polaris-focus-ring:focus {
+  outline: 2px solid var(--p-color-bg-primary);
+  outline-offset: 2px;
+}
+
+/* 加载状态 */
+.polaris-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: polaris-skeleton-loading 1.5s infinite;
+  border-radius: var(--p-border-radius-base);
+}
+
+@keyframes polaris-skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

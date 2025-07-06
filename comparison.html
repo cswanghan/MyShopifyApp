@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTax-Bridge 设计系统对比</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+        .comparison-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .version-header {
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        .old-version {
+            background: linear-gradient(135deg, #00C9C8 0%, #00A09F 100%);
+            color: white;
+        }
+        .new-version {
+            background: linear-gradient(135deg, #2c6ecb 0%, #255dab 100%);
+            color: white;
+        }
+        .iframe-container {
+            height: 600px;
+            overflow: hidden;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .feature-comparison {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .feature-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1rem;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .feature-row:last-child {
+            border-bottom: none;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        .status-same { background: #dbeafe; color: #1e40af; }
+        .status-improved { background: #d1fae5; color: #065f46; }
+        .status-changed { background: #fef3c7; color: #92400e; }
+        .status-new { background: #e0e7ff; color: #3730a3; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- 页面标题 -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">DTax-Bridge 设计系统对比</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                对比当前版本与新Polaris设计规范版本的视觉和交互差异，
+                帮助您了解升级后的改进点和新特性。
+            </p>
+        </div>
+
+        <!-- 并排对比视图 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- 当前版本 -->
+            <div class="comparison-card">
+                <div class="version-header old-version">
+                    <div class="flex items-center justify-between">
+                        <span>当前版本 (Demo)</span>
+                        <span class="text-sm opacity-90">基于自定义设计系统</span>
+                    </div>
+                </div>
+                <div class="iframe-container">
+                    <iframe src="http://localhost:3000" title="当前版本Demo"></iframe>
+                </div>
+            </div>
+
+            <!-- 新版本 -->
+            <div class="comparison-card">
+                <div class="version-header new-version">
+                    <div class="flex items-center justify-between">
+                        <span>新版本 (Polaris)</span>
+                        <span class="text-sm opacity-90">基于Shopify Polaris设计系统</span>
+                    </div>
+                </div>
+                <div class="iframe-container">
+                    <div class="h-full bg-gray-100 flex items-center justify-center text-center p-8">
+                        <div>
+                            <div class="text-6xl mb-4">🚧</div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Polaris版本开发中</h3>
+                            <p class="text-gray-600 mb-4">正在基于design_std.html规范构建新版本</p>
+                            <button 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                onclick="window.open('design_std.html', '_blank')"
+                            >
+                                查看设计规范
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细功能对比 -->
+        <div class="feature-comparison">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">功能对比分析</h2>
+            
+            <div class="feature-row font-semibold text-gray-700 bg-white rounded-lg p-3">
+                <div>设计元素</div>
+                <div class="text-center">当前版本</div>
+                <div class="text-center">Polaris版本</div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">主色调</div>
+                    <div class="text-sm text-gray-600">应用的主要品牌色彩</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge" style="background: #00C9C8; color: white;">#00C9C8 (青绿)</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge" style="background: #2c6ecb; color: white;">#2c6ecb (Polaris蓝)</div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">字体系统</div>
+                    <div class="text-sm text-gray-600">排版和字体选择</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-same">Shopify Sans</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-improved">Inter + 语义化层级</div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">卡片设计</div>
+                    <div class="text-sm text-gray-600">组件卡片的视觉样式</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-same">自定义阴影</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-improved">Polaris标准卡片</div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">按钮系统</div>
+                    <div class="text-sm text-gray-600">交互按钮的设计规范</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-changed">基础按钮</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-improved">完整按钮系统</div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">响应式布局</div>
+                    <div class="text-sm text-gray-600">多设备适配能力</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-same">基础响应式</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-improved">Polaris断点系统</div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">状态指示器</div>
+                    <div class="text-sm text-gray-600">成功/错误/警告状态</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-same">基础Badge</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-new">语义化徽章系统</div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">交互反馈</div>
+                    <div class="text-sm text-gray-600">用户操作反馈机制</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-changed">基础动画</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-new">横幅通知系统</div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">可访问性</div>
+                    <div class="text-sm text-gray-600">无障碍访问支持</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-same">基础支持</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-improved">完全符合WCAG</div>
+                </div>
+            </div>
+
+            <div class="feature-row">
+                <div>
+                    <div class="font-medium text-gray-900">设计一致性</div>
+                    <div class="text-sm text-gray-600">与Shopify后台的一致性</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-changed">部分一致</div>
+                </div>
+                <div class="text-center">
+                    <div class="status-badge status-improved">完全一致</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关键改进点 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg p-6 shadow-sm border">
+                <div class="text-3xl mb-3">🎨</div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">视觉一致性</h3>
+                <p class="text-gray-600 text-sm">
+                    新版本完全遵循Shopify Polaris设计系统，确保与Shopify后台体验完全一致，提升商家信任度。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border">
+                <div class="text-3xl mb-3">♿</div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">可访问性</h3>
+                <p class="text-gray-600 text-sm">
+                    完全符合WCAG 2.1 AA标准，支持键盘导航、屏幕阅读器，确保所有用户都能顺畅使用。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border">
+                <div class="text-3xl mb-3">📱</div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">响应式优化</h3>
+                <p class="text-gray-600 text-sm">
+                    基于Polaris断点系统重构，在手机、平板、桌面设备上都提供最佳用户体验。
+                </p>
+            </div>
+        </div>
+
+        <!-- 升级时间线 -->
+        <div class="bg-white rounded-lg p-6 shadow-sm border">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">升级时间线</h2>
+            <div class="space-y-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-900">设计规范分析 ✅</div>
+                        <div class="text-sm text-gray-600">分析design_std.html规范，制定升级策略</div>
+                    </div>
+                    <div class="text-sm text-gray-500">已完成</div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-900">创建Polaris样式系统 🚧</div>
+                        <div class="text-sm text-gray-600">基于设计令牌重构CSS样式系统</div>
+                    </div>
+                    <div class="text-sm text-gray-500">进行中</div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-900">组件升级改造</div>
+                        <div class="text-sm text-gray-600">逐个升级Dashboard、表单、表格等核心组件</div>
+                    </div>
+                    <div class="text-sm text-gray-500">计划中</div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-900">交互体验优化</div>
+                        <div class="text-sm text-gray-600">增强动画效果、反馈机制和用户引导</div>
+                    </div>
+                    <div class="text-sm text-gray-500">计划中</div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="w-4 h-4 bg-gray-300 rounded-full"></div>
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-900">测试和发布</div>
+                        <div class="text-sm text-gray-600">全面测试新版本，确保质量后发布</div>
+                    </div>
+                    <div class="text-sm text-gray-500">计划中</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="text-center mt-8 space-x-4">
+            <button 
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                onclick="window.open('design_std.html', '_blank')"
+            >
+                查看完整设计规范
+            </button>
+            <button 
+                class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                onclick="window.open('http://localhost:3000', '_blank')"
+            >
+                体验当前版本
+            </button>
+        </div>
+    </div>
+</body>
+</html>
