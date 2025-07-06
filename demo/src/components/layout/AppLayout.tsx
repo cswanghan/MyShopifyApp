@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useCallback, useState } from 'react'
+import { ThemeSwitcher } from '../ThemeSwitcher'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -150,6 +151,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </button>
           <h1 className="page-title">{getPageTitle()}</h1>
           <div className="top-bar-actions">
+            <ThemeSwitcher />
             {pageAction && (
               <button 
                 className="btn btn-primary"
